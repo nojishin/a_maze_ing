@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
     { name = "nojishin", email = "154789190+nojishin@users.noreply.github.com" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 dependencies = []
 
 [build-system]
@@ -17,4 +17,25 @@ build-backend = "uv_build"
 dev = [
     "mypy>=2.3.1",
     "ruff>=0.16.7",
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D203", # conflicts with D211
+    "D213", # conflicts with D212
+]
+unfixable = [
+    "F401", # unused import
+    "F841", # unused variable
+]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
 ]
