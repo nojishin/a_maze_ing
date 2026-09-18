@@ -1,3 +1,4 @@
 .venv
 docs/
 .mypy_cache
+CLAUDE.md
