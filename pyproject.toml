@@ -28,6 +28,7 @@ ignore = [
 unfixable = [
     "F401", # unused import
     "F841", # unused variable
+    "CPY001", # no copyright notice needed for a school project
 ]
 
 [tool.mypy]
