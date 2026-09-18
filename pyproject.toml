@@ -24,11 +24,12 @@ select = ["ALL"]
 ignore = [
     "D203", # conflicts with D211
     "D213", # conflicts with D212
+    "CPY001", # no copyright notice needed for a school project
+    "T201", # intentional CLI output, not debug leftovers
 ]
 unfixable = [
     "F401", # unused import
     "F841", # unused variable
-    "CPY001", # no copyright notice needed for a school project
 ]
 
 [tool.mypy]
