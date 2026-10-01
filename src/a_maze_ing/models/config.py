@@ -1,5 +1,6 @@
-from pydantic import BaseModel, ConfigDict, Field, BeforeValidator
 from typing import Annotated
+
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
 
 MazeSize = Annotated[int, Field(ge=1, le=100)]
 MazeCoord = Annotated[int, Field(ge=0, le=99)]
