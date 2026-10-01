@@ -14,7 +14,7 @@ from a_maze_ing.errors.exceptions import (
 
 def _read_config_file(path: Path) -> str:
     try:
-        with open(path, "r") as f:
+        with Path.open(path) as f:
             return f.read()
     except FileNotFoundError as e:
         raise ConfigFileNotFoundError(path) from e
