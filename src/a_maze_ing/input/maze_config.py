@@ -50,13 +50,3 @@ def parse_config() -> Config:
     config_text = _read_config_file(config_path)
     config_dict = _extract_dict(config_text)
     return _validate_config(config_dict)
-
-
-# ! test
-def main() -> None:
-    text = _read_config_file(get_config_path())
-    d = _extract_dict(text)
-    print(d)
-
-
-main()
