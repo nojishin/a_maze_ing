@@ -1,11 +1,14 @@
 from .cli import get_config_path
 from pathlib import Path
+from a_maze_ing.models.config import Config
+from pydantic import ValidationError
 
 from a_maze_ing.errors.exceptions import (
     ConfigFileNotFoundError,
     ConfigFileReadError,
     ConfigFileFormatError,
     ConfigDuplicateKeyError,
+    ConfigValidationError,
 )
 
 
@@ -21,7 +24,6 @@ def _read_config_file(path: Path) -> str:
 
 def _extract_dict(text: str) -> dict[str, str]:
     text_splitlines = text.splitlines()
-    print("textsplitlines:", text_splitlines)
     result: dict[str, str] = {}
     for i, line in enumerate(text_splitlines):
         if line.startswith("#"):
@@ -29,12 +31,25 @@ def _extract_dict(text: str) -> dict[str, str]:
         key, sep, value = line.partition("=")
         if not sep:
             raise ConfigFileFormatError(line)
-        print(f"{line}({sep}), ", end="")
         if key in result:
             raise ConfigDuplicateKeyError(key, i + 1)
         result[key] = value
-    print("\n\nresult:", result)
     return result
+
+
+def _validate_config(config_dict: dict[str, str]) -> Config:
+    try:
+        config = Config.model_validate(config_dict)
+    except ValidationError as e:
+        raise ConfigValidationError(str(e)) from e
+    return config
+
+
+def parse_config() -> Config:
+    config_path = get_config_path()
+    config_text = _read_config_file(config_path)
+    config_dict = _extract_dict(config_text)
+    return _validate_config(config_dict)
 
 
 # ! test

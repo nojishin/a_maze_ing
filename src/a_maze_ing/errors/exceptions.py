@@ -30,3 +30,8 @@ class ConfigFileFormatError(MazeError):
 class ConfigDuplicateKeyError(MazeError):
     def __init__(self, key: str, line_no: int) -> None:
         super().__init__(f"Duplicate key '{key}' found at line {line_no}")
+
+
+class ConfigValidationError(MazeError):
+    def __init__(self, reason: str) -> None:
+        super().__init__(f"Invalid config values: {reason}")
