@@ -22,21 +22,19 @@ def _read_config_file(path: Path) -> str:
 def _extract_dict(text: str) -> dict[str, str]:
     text_splitlines = text.splitlines()
     print("textsplitlines:", text_splitlines)
-    # remove comments
-    text_splitlines = [line for line in text_splitlines if not line.startswith("#")]
-    print("remove:", text_splitlines)
     result: dict[str, str] = {}
     for i, line in enumerate(text_splitlines):
-        split_str = line.split("=", 1)
-        print(f"{line}({len(split_str)}), ", end="")
-        if len(split_str) != 2:
+        if line.startswith("#"):
+            continue
+        key, sep, value = line.partition("=")
+        if not sep:
             raise ConfigFileFormatError(line)
-        if split_str[0] in result:
-            raise ConfigDuplicateKeyError(split_str[0], i + 1)
-        result[split_str[0]] = split_str[1]
+        print(f"{line}({sep}), ", end="")
+        if key in result:
+            raise ConfigDuplicateKeyError(key, i + 1)
+        result[key] = value
     print("\n\nresult:", result)
     return result
-
 
 
 # ! test
