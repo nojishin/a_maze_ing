@@ -13,11 +13,13 @@ from models.config import Config
 
 from .cli import get_config_path
 
+READ_SIZE_LIMIT = 100000
+
 
 def _read_config_file(path: Path) -> str:
     try:
         with Path.open(path) as f:
-            return f.read()
+            return f.read(READ_SIZE_LIMIT)
     except FileNotFoundError as e:
         raise ConfigFileNotFoundError(path) from e
     except (OSError, ValueError) as e:
