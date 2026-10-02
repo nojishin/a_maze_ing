@@ -2,14 +2,14 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from a_maze_ing.errors.exceptions import (
+from errors.exceptions import (
     ConfigDuplicateKeyError,
     ConfigFileFormatError,
     ConfigFileNotFoundError,
     ConfigFileReadError,
     ConfigValidationError,
 )
-from a_maze_ing.models.config import Config
+from models.config import Config
 
 from .cli import get_config_path
 

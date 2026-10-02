@@ -1,6 +1,6 @@
 import sys
 
-from a_maze_ing.errors.exceptions import MazeError
+from errors.exceptions import MazeError
 
 
 def error_handler(error: MazeError) -> None:
