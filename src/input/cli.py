@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 
-from a_maze_ing.errors.exceptions import InvalidArgumentsCountError
+from errors.exceptions import InvalidArgumentsCountError
 
 EXPECTED_ARGC = 2
 
