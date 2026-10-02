@@ -1,6 +1,6 @@
-from typing import Annotated
+from typing import Annotated, Self
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
 
 MazeSize = Annotated[int, Field(ge=1, le=100)]
 MazeCoord = Annotated[int, Field(ge=0, le=99)]
@@ -24,3 +24,9 @@ class Config(BaseModel):
     exit: MazePoint
     output_file: str
     is_perfect: bool = Field(alias="PERFECT")
+
+    @model_validator(mode="after")
+    def check_entry_exit_differ(self) -> Self:
+        if self.entry == self.exit:
+            raise ValueError
+        return self
