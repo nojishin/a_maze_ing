@@ -45,7 +45,7 @@ def _format_error(error: ErrorDetails) -> str:
         message += ".".join(map(str, key))
         message += ": "
     message += reason
-    if input_value:
+    if key and error["type"] != "missing":
         message += f" (got {input_value!r})"
     return message
 
