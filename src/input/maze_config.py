@@ -45,7 +45,7 @@ def _validate_config(config_dict: dict[str, str]) -> Config:
     try:
         config = Config.model_validate(config_dict)
     except ValidationError as e:
-        raise ConfigValidationError(str(e)) from e
+        raise ConfigValidationError(e) from e
     return config
 
 
