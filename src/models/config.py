@@ -8,10 +8,15 @@ MazeCoord = Annotated[int, Field(ge=0, le=99)]
 
 def parse_coord(value: str) -> tuple[int, int]:
     x, sep, y = value.partition(",")
+    msg = "Input should be two integers in the format 'x,y'"
     if not sep:
-        msg = "expected format 'x,y'"
         raise ValueError(msg)
-    return (int(x), int(y))
+    try:
+        int_x = int(x)
+        int_y = int(y)
+    except ValueError as e:
+        raise ValueError(msg) from e
+    return (int_x, int_y)
 
 
 MazePoint = Annotated[tuple[MazeCoord, MazeCoord], BeforeValidator(parse_coord)]
@@ -19,6 +24,7 @@ MazePoint = Annotated[tuple[MazeCoord, MazeCoord], BeforeValidator(parse_coord)]
 
 class Config(BaseModel):
     model_config = ConfigDict(alias_generator=str.upper, extra="forbid")
+
     width: MazeSize
     height: MazeSize
     entry: MazePoint
