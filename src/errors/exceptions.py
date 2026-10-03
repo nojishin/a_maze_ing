@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from pydantic import ValidationError
+from pydantic_core import ErrorDetails
 
 
 class MazeError(Exception): ...
@@ -34,18 +35,23 @@ class ConfigDuplicateKeyError(MazeError):
         super().__init__(f"Duplicate key {key!r} found at line {line_no}")
 
 
+def _format_error(error: ErrorDetails) -> str:
+
+    message = ""
+    key = error["loc"]
+    reason = error["msg"]
+    input_value = error["input"]
+    if key:
+        message += ".".join(map(str, key))
+        message += ": "
+    message += str(reason)
+    if input_value:
+        message += f" (got {input_value!r})"
+    return message
+
+
 class ConfigValidationError(MazeError):
     def __init__(self, validation_error: ValidationError) -> None:
-        message = "Invalid config values:\n"
-        for error in validation_error.errors():
-            key = error["loc"]
-            reason = error["msg"]
-            input_value = error["input"]
-            if key:
-                message += ".".join(map(str, key))
-                message += ": "
-            message += str(reason)
-            if input_value:
-                message += f" (got {input_value!r})"
-            message += "\n"
-        super().__init__(message)
+        lines = ["Invalid config values:"]
+        lines = [_format_error(error) for error in validation_error.errors()]
+        super().__init__("\n".join(lines))
