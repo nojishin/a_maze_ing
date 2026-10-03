@@ -30,3 +30,28 @@ class Config(BaseModel):
         if self.entry == self.exit:
             raise ValueError
         return self
+
+    @model_validator(mode="after")
+    def check_entry_exit_in_bounds(self) -> Self:
+        def _is_out_of_range(size: int, value: int) -> bool:
+            return size <= value
+
+        def _is_out_of_bounds(
+            width: int,
+            height: int,
+            point: tuple[int, int],
+        ) -> bool:
+            x, y = point
+            return _is_out_of_range(width, x) or _is_out_of_range(height, y)
+
+        if _is_out_of_bounds(
+            self.width,
+            self.height,
+            self.entry,
+        ) or _is_out_of_bounds(
+            self.width,
+            self.height,
+            self.exit,
+        ):
+            raise ValueError
+        return self
