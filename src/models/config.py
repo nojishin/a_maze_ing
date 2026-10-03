@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated, Self
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
@@ -6,7 +7,7 @@ MazeSize = Annotated[int, Field(ge=1, le=100)]
 MazeCoord = Annotated[int, Field(ge=0, le=99)]
 
 
-def parse_coord(value: str) -> tuple[int, int]:
+def _parse_coord(value: str) -> tuple[int, int]:
     x, sep, y = value.partition(",")
     msg = "Input should be two integers in the format 'x,y'"
     if not sep:
@@ -19,7 +20,13 @@ def parse_coord(value: str) -> tuple[int, int]:
     return (int_x, int_y)
 
 
-MazePoint = Annotated[tuple[MazeCoord, MazeCoord], BeforeValidator(parse_coord)]
+MazePoint = Annotated[tuple[MazeCoord, MazeCoord], BeforeValidator(_parse_coord)]
+
+
+def _parse_output_file(value: str) -> str:
+    if not value:
+        raise ValueError("Input should not be empty")
+    return value
 
 
 class Config(BaseModel):
@@ -29,7 +36,7 @@ class Config(BaseModel):
     height: MazeSize
     entry: MazePoint
     exit: MazePoint
-    output_file: str
+    output_file: Annotated[Path, BeforeValidator(_parse_output_file)]
     is_perfect: bool = Field(alias="PERFECT")
 
     @model_validator(mode="after")
