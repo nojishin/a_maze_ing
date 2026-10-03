@@ -25,7 +25,8 @@ MazePoint = Annotated[tuple[MazeCoord, MazeCoord], BeforeValidator(_parse_coord)
 
 def _parse_output_file(value: str) -> str:
     if not value:
-        raise ValueError("Input should not be empty")
+        msg = "Input should not be empty"
+        raise ValueError(msg)
     return value
 
 
@@ -48,16 +49,13 @@ class Config(BaseModel):
 
     @model_validator(mode="after")
     def check_entry_exit_in_bounds(self) -> Self:
-        def _is_out_of_range(size: int, value: int) -> bool:
-            return size <= value
-
         def _is_out_of_bounds(
             width: int,
             height: int,
             point: tuple[int, int],
         ) -> bool:
             x, y = point
-            return _is_out_of_range(width, x) or _is_out_of_range(height, y)
+            return x >= width or y >= height
 
         errors: list[str] = []
         if _is_out_of_bounds(
