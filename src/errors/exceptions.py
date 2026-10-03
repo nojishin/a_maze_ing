@@ -44,7 +44,7 @@ def _format_error(error: ErrorDetails) -> str:
     if key:
         message += ".".join(map(str, key))
         message += ": "
-    message += str(reason)
+    message += reason
     if input_value:
         message += f" (got {input_value!r})"
     return message
@@ -53,5 +53,5 @@ def _format_error(error: ErrorDetails) -> str:
 class ConfigValidationError(MazeError):
     def __init__(self, validation_error: ValidationError) -> None:
         lines = ["Invalid config values:"]
-        lines = [_format_error(error) for error in validation_error.errors()]
+        lines.extend(_format_error(error) for error in validation_error.errors())
         super().__init__("\n".join(lines))
