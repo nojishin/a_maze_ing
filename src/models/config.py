@@ -1,7 +1,13 @@
 from pathlib import Path
 from typing import Annotated, Self
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    model_validator,
+)
 
 MazeSize = Annotated[int, Field(ge=1, le=100)]
 MazeCoord = Annotated[int, Field(ge=0, le=99)]
@@ -20,7 +26,10 @@ def _parse_coord(value: str) -> tuple[int, int]:
     return (int_x, int_y)
 
 
-MazePoint = Annotated[tuple[MazeCoord, MazeCoord], BeforeValidator(_parse_coord)]
+MazePoint = Annotated[
+    tuple[MazeCoord, MazeCoord],
+    BeforeValidator(_parse_coord),
+]
 
 
 def _parse_output_file(value: str) -> str:
@@ -73,7 +82,8 @@ class Config(BaseModel):
             self.exit,
         ):
             errors.append(
-                f"EXIT {self.exit!s} is outside the maze ({self.width}x{self.height})",
+                f"EXIT {self.exit!s} is outside the maze "
+                f"({self.width}x{self.height})",
             )
         if errors:
             raise ValueError(", ".join(errors))

@@ -50,7 +50,10 @@ def _validate_config(config_dict: dict[str, str]) -> Config:
     return config
 
 
-def _ensure_output_differs_from_config(config_path: Path, output_path: Path) -> None:
+def _ensure_output_differs_from_config(
+    config_path: Path,
+    output_path: Path,
+) -> None:
     if config_path.resolve() == output_path.resolve():
         raise OutputFileConflictError(output_path)
 
