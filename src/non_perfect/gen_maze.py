@@ -11,9 +11,9 @@ MOVES = {N: (0, -1, S), E: (1, 0, W), S: (0, 1, N), W: (-1, 0, E)}
 
 
 def add_wall(grid, x, y, direction) -> None:
-    grid[x][y] |= direction
+    grid[y][x] |= direction
     dx, dy, opposite = MOVES[direction]
-    grid[x + dx][y + dy] |= opposite
+    grid[y + dy][x + dx] |= opposite
 
 
 def choose_orientation(width: int, height: int) -> bool:
@@ -44,7 +44,12 @@ def divide_horizontal(
 ) -> None:
     wall_y = y + random.randint(0, height - 2)
     passage_x = random.randint(x, x + width - 1)
-    divide()
+    for col in range(x, x + width):
+        if col == passage_x:
+            continue
+        add_wall(grid, col, wall_y, S)
+    divide(grid, x, y, width, wall_y - y + 1)
+    divide(grid, x, wall_y + 1, width, y + height - wall_y - 1)
 
 
 def divide_vertical(
@@ -54,7 +59,14 @@ def divide_vertical(
     width: int,
     height: int,
 ) -> None:
-    divide()
+    wall_x = x + random.randint(0, width - 2)
+    passage_y = random.randint(y, y + height - 1)
+    for row in range(y, y + height):
+        if row == passage_y:
+            continue
+        add_wall(grid, wall_x, row, E)
+    divide(grid, x, y, wall_x - x + 1, height)
+    divide(grid, wall_x + 1, y, x + width - wall_x - 1, height)
 
 
 def divide(
@@ -73,10 +85,9 @@ def divide(
         divide_vertical(grid, x, y, width, height)
 
 
-def generate(config: Config) -> str:
-    width = config.width
-    height = config.height
+def generate() -> None:
+    width = 20
+    height = 20
     grid = parse_grid()
-    blocked: set[tuple[int, int]] = set()
-    divide(width, height, 0, 0, grid, blocked)
-    return ""
+    random.seed(42)
+    divide(width, height, 0, 0, grid)
