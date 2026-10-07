@@ -13,4 +13,4 @@ class MazeGenerator:
         self._params = MazeParams(height, width, entry, exit, seed)
 
     def generate(self) -> None:
-        pass
+        print("generate called") # ! for dev
