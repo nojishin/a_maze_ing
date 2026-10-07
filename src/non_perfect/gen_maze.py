@@ -10,7 +10,7 @@ W = 0b1000
 MOVES = {N: (0, -1, S), E: (1, 0, W), S: (0, 1, N), W: (-1, 0, E)}
 
 
-def add_wall(grid, x, y, direction) -> None:
+def add_wall(grid: list[list[int]], x: int, y: int, direction: int) -> None:
     grid[y][x] |= direction
     dx, dy, opposite = MOVES[direction]
     grid[y + dy][x + dx] |= opposite
@@ -71,8 +71,8 @@ def divide_vertical(
 
 def divide(
     grid: list[list[int]],
-    x,
-    y,
+    x: int,
+    y: int,
     width: int,
     height: int,
 ) -> None:
@@ -85,9 +85,10 @@ def divide(
         divide_vertical(grid, x, y, width, height)
 
 
-def generate() -> None:
+def generate() -> list[list[int]]:
     width = 20
     height = 20
-    grid = parse_grid()
+    grid = parse_grid(width,height)
     random.seed(42)
-    divide(width, height, 0, 0, grid)
+    divide(grid, 0, 0, width, height)
+    return grid
