@@ -17,6 +17,9 @@ dev = [
     "ruff>=0.16.7",
 ]
 
+[tool.ruff]
+line-length = 79
+
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
