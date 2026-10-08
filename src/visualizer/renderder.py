@@ -1,44 +1,10 @@
-import sys
-from pathlib import Path
-
 NORTH_BIT = 0
 EAST_BIT = 1
 SOUTH_BIT = 2
 WEST_BIT = 3
 
 
-class MazeFormatError(Exception):
-    def __init__(self, msg: str = "The maze was not generated correctly."):
-        super().__init__(msg)
-
-
-def parse_hex_grid(file_path: Path) -> list[list[int]]:
-    with file_path.open() as f:
-        lines: list[str] = []
-        for raw_line in f:
-            line = raw_line.strip("\n")
-            if line == "":
-                break
-            lines.append(line)
-    if not lines:
-        raise MazeFormatError
-
-    width = len(lines[0])
-    grid: list[list[int]] = []
-
-    for line in lines:
-        if len(line) != width:
-            raise MazeFormatError
-        try:
-            row = [int(char, 16) for char in line]
-        except ValueError:
-            raise ValueError
-        else:
-            grid.append(row)
-    return grid
-
-
-def build_wall_grids(
+def _build_wall_grids(
     grid: list[list[int]],
 ) -> tuple[list[list[bool]], list[list[bool]]]:
     height = len(grid)
@@ -67,7 +33,7 @@ def build_wall_grids(
 def render_maze(grid: list[list[int]]) -> str:
     height = len(grid)
     width = len(grid[0])
-    h_wall, v_wall = build_wall_grids(grid)
+    h_wall, v_wall = _build_wall_grids(grid)
     canvas = [["  "] * (2 * width + 1) for _ in range(2 * height + 1)]
 
     for row in range(height + 1):
@@ -93,12 +59,3 @@ def render_maze(grid: list[list[int]]) -> str:
             )
 
     return "\n".join("".join(row) for row in canvas)
-
-
-def main():
-    grid = parse_hex_grid(Path(sys.argv[1]))
-    print(render_maze(grid))
-
-
-if __name__ == "__main__":
-    main()
