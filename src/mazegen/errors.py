@@ -20,9 +20,9 @@ def _format_error(error: ErrorDetails) -> str:
     return message
 
 
-class ConfigValidationError(MazegenError):
+class ParamsValidationError(MazegenError):
     def __init__(self, validation_error: ValidationError) -> None:
-        lines = ["Invalid config values:"]
+        lines = ["Invalid parameter values:"]
         lines.extend(
             _format_error(error) for error in validation_error.errors()
         )
