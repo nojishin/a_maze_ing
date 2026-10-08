@@ -1,4 +1,5 @@
 import random
+from collections import deque
 
 from models import Config
 
@@ -8,6 +9,33 @@ S = 0b0100
 W = 0b1000
 
 MOVES = {N: (0, -1, S), E: (1, 0, W), S: (0, 1, N), W: (-1, 0, E)}
+
+PATTERN = [
+    "X...XXX",
+    "X.....X",
+    "XXX.XXX",
+    "..X.X..",
+    "..X.XXX",
+]
+
+
+def make_blocked(width: int, height: int) -> set[tuple[int, int]]:
+    if width < 9 or height < 7:
+        return set()
+    offset_x = (width - 7) // 2
+    offset_y = (height - 5) // 2
+    blocked: set[tuple[int, int]] = set()
+    for j, line in enumerate(PATTERN):
+        for i, char in enumerate(line):
+            if char == "X":
+                blocked.add((offset_x + i, offset_y + j))
+    return blocked
+
+
+def close_blocked(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+    for x, y in blocked:
+        for direction in MOVES:
+            add_wall(grid, x, y, direction)
 
 
 def add_wall(grid: list[list[int]], x: int, y: int, direction: int) -> None:
@@ -24,6 +52,12 @@ def choose_orientation(width: int, height: int) -> bool:
     return random.choice([True, False])
 
 
+def remove_wall(grid: list[list[int]], x: int, y: int, direction: int) -> None:
+    grid[y][x] &= ~direction
+    dx, dy, opposssite = MOVES[direction]
+    grid[y + dy][x + dx] &= ~opposssite
+
+
 def parse_grid(width: int, height: int) -> list[list[int]]:
     grid = [[0] * width for _ in range(height)]
     for x in range(width):
@@ -33,6 +67,58 @@ def parse_grid(width: int, height: int) -> list[list[int]]:
         grid[y][0] |= W
         grid[y][width - 1] |= E
     return grid
+
+
+def flood(
+    grid: list[list[int]],
+    start: tuple[int, int],
+    visited: set[tuple[int, int]],
+    blocked: set[tuple[int, int]],
+) -> None:
+    queue = deque([start])
+    visited.add(start)
+    while queue:
+        x, y = queue.popleft()
+        for direction, (dx, dy, _) in MOVES.items():
+            if grid[y][x] & direction:
+                continue
+            nx, ny = x + dx, y + dy
+            if (nx, ny) in visited:
+                continue
+            visited.add((nx, ny))
+            queue.append((nx, ny))
+
+
+def find_candidates(
+    grid: list[list[int]],
+    visited: set[tuple[int, int]],
+    blocked: set[tuple[int, int]],
+) -> list[tuple[int, int, int]]:
+    height = len(grid)
+    width = len(grid[0])
+    candidates = []
+    for x, y in visited:
+        for direction, (dx, dy, _) in MOVES.items():
+            nx, ny = x + dx, y + dy
+            if not (0 <= nx < width and 0 <= ny < height):
+                continue
+            if (nx, ny) in visited or (nx, ny) in blocked:
+                continue
+            candidates.append((x, y, direction))
+    return candidates
+
+
+def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+    visited: set[tuple[int, int]] = set()
+    flood(grid, (0, 0), visited, blocked)
+    while True:
+        candidates = find_candidates(grid, visited, blocked)
+        if not candidates:
+            return
+        x, y, direction = random.choice(candidates)
+        remove_wall(grid, x, y, direction)
+        dx, dy, _ = MOVES[direction]
+        flood(grid, (x + dx, y + dy), visited, blocked)
 
 
 def divide_horizontal(
@@ -88,7 +174,7 @@ def divide(
 def generate() -> list[list[int]]:
     width = 20
     height = 20
-    grid = parse_grid(width,height)
+    grid = parse_grid(width, height)
     random.seed(42)
     divide(grid, 0, 0, width, height)
     return grid
