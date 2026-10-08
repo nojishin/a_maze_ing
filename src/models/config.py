@@ -48,6 +48,7 @@ class Config(BaseModel):
     exit: MazePoint
     output_file: Annotated[Path, BeforeValidator(_parse_output_file)]
     is_perfect: bool = Field(alias="PERFECT")
+    seed: int | None = None
 
     @model_validator(mode="after")
     def check_entry_exit_differ(self) -> Self:
