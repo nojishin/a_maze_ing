@@ -1,35 +1,16 @@
 from typing import Annotated, Self
 
-from pydantic import BaseModel, BeforeValidator, Field, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 MazeSize = Annotated[int, Field(ge=1, le=100)]
 MazeCoord = Annotated[int, Field(ge=1, le=99)]
 
 
-def _parse_coord(value: str) -> tuple[int, int]:
-    x, sep, y = value.partition(",")
-    msg = "Input should be two integers in the format 'x,y'"
-    if not sep:
-        raise ValueError(msg)
-    try:
-        int_x = int(x)
-        int_y = int(y)
-    except ValueError as e:
-        raise ValueError(msg) from e
-    return (int_x, int_y)
-
-
-MazePoint = Annotated[
-    tuple[MazeCoord, MazeCoord],
-    BeforeValidator(_parse_coord),
-]
-
-
 class MazeParams(BaseModel):
     width: MazeSize
     height: MazeSize
-    entry: MazePoint
-    exit: MazePoint
+    entry: tuple[MazeCoord, MazeCoord]
+    exit: tuple[MazeCoord, MazeCoord]
     is_perfect: bool
     seed: int | None = None
 
