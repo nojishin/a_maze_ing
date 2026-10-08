@@ -53,10 +53,14 @@ def _format_error(error: ErrorDetails) -> str:
 class ConfigValidationError(MazeError):
     def __init__(self, validation_error: ValidationError) -> None:
         lines = ["Invalid config values:"]
-        lines.extend(_format_error(error) for error in validation_error.errors())
+        lines.extend(
+            _format_error(error) for error in validation_error.errors()
+        )
         super().__init__("\n".join(lines))
 
 
 class OutputFileConflictError(MazeError):
     def __init__(self, path: Path) -> None:
-        super().__init__(f"OUTPUT_FILE must not be the config file itself: '{path}'")
+        super().__init__(
+            f"OUTPUT_FILE must not be the config file itself: '{path}'",
+        )
