@@ -1,8 +1,6 @@
 import sys
 
-from errors.exceptions import MazeError
 
-
-def error_handler(error: MazeError) -> None:
+def error_handler(error: Exception) -> None:
     print(str(error))
     sys.exit(1)
