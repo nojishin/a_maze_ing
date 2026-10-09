@@ -3,9 +3,8 @@ EAST_BIT = 1
 SOUTH_BIT = 2
 WEST_BIT = 3
 
-WALL = "033[47m  \033[0m"
+WALL = "\033[47m  \033[0m"
 SPACE = "  "
-
 
 
 def _build_wall_grids(
@@ -52,14 +51,12 @@ def render_maze(grid: list[list[int]]) -> str:
 
     for row in range(height + 1):
         for col in range(width):
-            canvas[2 * row][2 * col + 1] = (
-                WALL if h_wall[row][col] else SPACE
-            )
+            if h_wall[row][col]:
+                canvas[2 * row][2 * col + 1] = WALL
 
     for row in range(height):
         for col in range(width + 1):
-            canvas[2 * row + 1][2 * col] = (
-                WALL if v_wall[row][col] else SPACE
-            )
+            if v_wall[row][col]:
+                canvas[2 * row + 1][2 * col] = WALL
 
     return "\n".join("".join(row) for row in canvas)
