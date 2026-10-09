@@ -5,6 +5,7 @@ from errors.handler import error_handler
 from input.maze_config import parse_config
 from mazegen import MazeGenerator, MazegenError
 from visualizer.renderder import render_maze
+# from test_visu import render_maze
 
 
 def main() -> None:
@@ -30,7 +31,7 @@ def main() -> None:
         "Commands:\n"
         "generate (g) : generate a new maze\n"
         "route    (r) : show / hide the solution path\n"
-        "exit     (e) : quit\n",
+        "exit     (q) : quit\n",
     )
     while True:
         try:
@@ -46,7 +47,7 @@ def main() -> None:
                 print(render_maze(result))
             case "route" | "r":
                 print("route called from main")
-            case "exit" | "e":
+            case "exit" | "q":
                 break
             case _:
                 print(f"Unknown command: '{cmd}'")
