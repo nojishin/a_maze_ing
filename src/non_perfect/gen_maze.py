@@ -1,7 +1,6 @@
 import random
 from collections import deque
-
-from models import Config
+from errors.exceptions import MazeError
 
 N = 0b0001
 E = 0b0010
@@ -54,8 +53,8 @@ def choose_orientation(width: int, height: int) -> bool:
 
 def remove_wall(grid: list[list[int]], x: int, y: int, direction: int) -> None:
     grid[y][x] &= ~direction
-    dx, dy, opposssite = MOVES[direction]
-    grid[y + dy][x + dx] &= ~opposssite
+    dx, dy, opposite = MOVES[direction]
+    grid[y + dy][x + dx] &= ~opposite
 
 
 def parse_grid(width: int, height: int) -> list[list[int]]:
@@ -73,7 +72,6 @@ def flood(
     grid: list[list[int]],
     start: tuple[int, int],
     visited: set[tuple[int, int]],
-    blocked: set[tuple[int, int]],
 ) -> None:
     queue = deque([start])
     visited.add(start)
@@ -162,19 +160,88 @@ def divide(
     width: int,
     height: int,
 ) -> None:
-    is_horizontal = choose_orientation(width, height)
     if width < 2 or height < 2:
         return
+    is_horizontal = choose_orientation(width, height)
     if is_horizontal:
         divide_horizontal(grid, x, y, width, height)
     else:
         divide_vertical(grid, x, y, width, height)
 
 
-def generate() -> list[list[int]]:
+def wall_candidates(
+    grid: list[list[int]],
+    blocked: set[tuple[int, int]],
+) -> list[tuple[int, int, int]]:
+    width = len(grid[0])
+    height = len(grid)
+    candidates = []
+    for y in range(height):
+        for x in range(width):
+            for direction in (E, S):
+                dx, dy, _ = MOVES[direction]
+                nx, ny = x + dx, y + dy
+                if nx >= width or ny >= height:
+                    continue
+                if (x, y) in blocked or (nx, ny) in blocked:
+                    continue
+                if grid[y][x] & direction == 0:
+                    continue
+                candidates.append((x, y, direction))
+    return candidates
+
+
+def is_open3x3(grid: list[list[int]], tx: int, ty: int) -> bool:
+    for y in range(ty, ty + 3):
+        for x in range(tx, tx + 3):
+            if x < tx + 2 and grid[y][x] & E:
+                return False
+            if y < ty + 2 and grid[y][x] & S:
+                return False
+    return True
+
+
+def makes_open_area(grid: list[list[int]], x: int, y: int) -> bool:
+    width = len(grid[0])
+    height = len(grid)
+    for ty in range(y - 2, y + 1):
+        for tx in range(x - 2, x + 1):
+            if is_open3x3(grid, tx, ty) and all(
+                (tx >= 0, tx + 2 < width, ty + 2 < height, ty >= 0),
+            ):
+                return True
+    return False
+
+def add_loops(grid:list[list[int]],blocked:set(tupe(int,int)), count)->None:
+    candidates = wall_candidates(grid,blocked)
+    random.shuffle(candidates)
+    breaked = 0
+    for sell in candidates:
+        x,y,direction = sell
+        remove_wall(grid,x,y,direction)
+        if makes_open_area(grid,x,y):
+            add_wall(grid,x,y,direction)
+        else:
+            breaked += 1
+        if count == blocked:
+            return
+    return
+
+
+
+def generate(maze_params: MazeParams) -> list[list[int]]:
     width = 20
     height = 20
     grid = parse_grid(width, height)
-    random.seed(42)
+    blocked = make_blocked(width,height)
+    if blocked == set():
+        msg = "Unable to display 42 patterns."
+        raise MazeError(msg)
+    random.seed(maze_params.seed)
     divide(grid, 0, 0, width, height)
+    repair(grid,blocked)
+    if not maze_params.is_perfect:
+        loop_ration = random.randint(10,30)
+        count = width * height // loop_ration
+        add_loops(grid,blocked,count)
     return grid
