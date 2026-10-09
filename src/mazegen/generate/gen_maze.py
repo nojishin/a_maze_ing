@@ -129,12 +129,7 @@ def divide(
         divide_vertical(grid, x, y, width, height)
 
 
-def make_result(grid: list[list[int]]) -> str:
-    return "\n".join("".join(f"{cell:X}" for cell in row) for row in grid)
-
-
 def generate(maze_params: MazeParams) -> list[list[int]]:
-    print("helper called")
     width = maze_params.width
     height = maze_params.height
     grid = parse_grid(width, height)
@@ -150,4 +145,3 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
         count = width * height // loop_ration
         add_loops(grid, blocked, count)
     return grid
-    return make_result(grid)
