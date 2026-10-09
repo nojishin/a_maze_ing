@@ -129,10 +129,6 @@ def divide(
         divide_vertical(grid, x, y, width, height)
 
 
-def make_result(grid: list[list[int]]) -> str:
-    return "\n".join("".join(f"{cell:X}" for cell in row) for row in grid)
-
-
 def generate(maze_params: MazeParams) -> str:
     width = maze_params.width
     height = maze_params.height
@@ -148,4 +144,4 @@ def generate(maze_params: MazeParams) -> str:
         loop_ration = random.randint(10, 30)
         count = width * height // loop_ration
         add_loops(grid, blocked, count)
-    return make_result(grid)
+    return grid
