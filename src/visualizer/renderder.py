@@ -3,6 +3,10 @@ EAST_BIT = 1
 SOUTH_BIT = 2
 WEST_BIT = 3
 
+WALL = "033[47m  \033[0m"
+SPACE = "  "
+
+
 
 def _build_wall_grids(
     grid: list[list[int]],
@@ -34,7 +38,7 @@ def render_maze(grid: list[list[int]]) -> str:
     height = len(grid)
     width = len(grid[0])
     h_wall, v_wall = _build_wall_grids(grid)
-    canvas = [["  "] * (2 * width + 1) for _ in range(2 * height + 1)]
+    canvas = [[SPACE] * (2 * width + 1) for _ in range(2 * height + 1)]
 
     for row in range(height + 1):
         for col in range(width + 1):
@@ -44,18 +48,18 @@ def render_maze(grid: list[list[int]]) -> str:
             right = col < width and h_wall[row][col]
             mask = up | down | left | right
             if mask:
-                canvas[2 * row][2 * col] = "\033[47m  \033[0m"
+                canvas[2 * row][2 * col] = WALL
 
     for row in range(height + 1):
         for col in range(width):
             canvas[2 * row][2 * col + 1] = (
-                "\033[47m  \033[0m" if h_wall[row][col] else "  "
+                WALL if h_wall[row][col] else SPACE
             )
 
     for row in range(height):
         for col in range(width + 1):
             canvas[2 * row + 1][2 * col] = (
-                "\033[47m  \033[0m" if v_wall[row][col] else "  "
+                WALL if v_wall[row][col] else SPACE
             )
 
     return "\n".join("".join(row) for row in canvas)
