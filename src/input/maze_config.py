@@ -8,6 +8,7 @@ from errors.exceptions import (
     ConfigFileNotFoundError,
     ConfigFileReadError,
     ConfigValidationError,
+    OutputFileConflictError,
 )
 from models.config import Config
 
@@ -45,12 +46,22 @@ def _validate_config(config_dict: dict[str, str]) -> Config:
     try:
         config = Config.model_validate(config_dict)
     except ValidationError as e:
-        raise ConfigValidationError(str(e)) from e
+        raise ConfigValidationError(e) from e
     return config
+
+
+def _ensure_output_differs_from_config(
+    config_path: Path,
+    output_path: Path,
+) -> None:
+    if config_path.resolve() == output_path.resolve():
+        raise OutputFileConflictError(output_path)
 
 
 def parse_config() -> Config:
     config_path = get_config_path()
     config_text = _read_config_file(config_path)
     config_dict = _extract_dict(config_text)
-    return _validate_config(config_dict)
+    config = _validate_config(config_dict)
+    _ensure_output_differs_from_config(config_path, config.output_file)
+    return config

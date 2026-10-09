@@ -1,5 +1,8 @@
 from pathlib import Path
 
+from pydantic import ValidationError
+from pydantic_core import ErrorDetails
+
 
 class MazeError(Exception): ...
 
@@ -14,24 +17,50 @@ class InvalidArgumentsCountError(MazeError):
 
 class ConfigFileNotFoundError(MazeError):
     def __init__(self, file_path: Path) -> None:
-        super().__init__(f"Config File not found: '{file_path}'")
+        super().__init__(f"Config File not found: {file_path!r}")
 
 
 class ConfigFileReadError(MazeError):
     def __init__(self, file_path: Path, reason: str) -> None:
-        super().__init__(f"Failed to read config file '{file_path}': {reason}")
+        super().__init__(f"Failed to read config file {file_path!r}: {reason}")
 
 
 class ConfigFileFormatError(MazeError):
     def __init__(self, line: str) -> None:
-        super().__init__(f"Invalid config file format '{line}'")
+        super().__init__(f"Invalid config file format {line!r}")
 
 
 class ConfigDuplicateKeyError(MazeError):
     def __init__(self, key: str, line_no: int) -> None:
-        super().__init__(f"Duplicate key '{key}' found at line {line_no}")
+        super().__init__(f"Duplicate key {key!r} found at line {line_no}")
+
+
+def _format_error(error: ErrorDetails) -> str:
+
+    message = ""
+    key = error["loc"]
+    reason = error["msg"]
+    input_value = error["input"]
+    if key:
+        message += ".".join(map(str, key))
+        message += ": "
+    message += reason
+    if key and error["type"] != "missing":
+        message += f" (got {input_value!r})"
+    return message
 
 
 class ConfigValidationError(MazeError):
-    def __init__(self, reason: str) -> None:
-        super().__init__(f"Invalid config values: {reason}")
+    def __init__(self, validation_error: ValidationError) -> None:
+        lines = ["Invalid config values:"]
+        lines.extend(
+            _format_error(error) for error in validation_error.errors()
+        )
+        super().__init__("\n".join(lines))
+
+
+class OutputFileConflictError(MazeError):
+    def __init__(self, path: Path) -> None:
+        super().__init__(
+            f"OUTPUT_FILE must not be the config file itself: '{path}'",
+        )
