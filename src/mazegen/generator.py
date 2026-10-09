@@ -1,5 +1,6 @@
 from pydantic import ValidationError
 
+from non_perfect.gen_maze import generate
 from .errors import ParamsValidationError
 from .models import MazeParams
 
@@ -28,4 +29,5 @@ class MazeGenerator:
             raise ParamsValidationError(e) from e
 
     def generate(self) -> None:
+        generate(self._params)
         print("generate called")  # ! for dev

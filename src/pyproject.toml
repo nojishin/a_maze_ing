@@ -36,6 +36,7 @@ ignore = [
     "D213", # conflicts with D212
     "CPY001", # no copyright notice needed for a school project
     "T201", # intentional CLI output, not debug leftovers
+    "D"
 ]
 unfixable = [
     "F401", # unused import
