@@ -129,7 +129,7 @@ def divide(
         divide_vertical(grid, x, y, width, height)
 
 
-def generate(maze_params: MazeParams) -> str:
+def generate(maze_params: MazeParams) -> list[list[int]]:
     width = maze_params.width
     height = maze_params.height
     grid = parse_grid(width, height)
