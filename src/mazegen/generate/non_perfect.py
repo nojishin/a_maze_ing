@@ -1,6 +1,6 @@
 import random
 
-from .maze_utils import E, MOVES, S, add_wall, remove_wall
+from .maze_utils import MOVES, E, S, add_wall, remove_wall
 
 
 def wall_candidates(
