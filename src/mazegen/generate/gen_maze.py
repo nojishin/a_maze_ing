@@ -6,7 +6,7 @@ from errors.exceptions import MazeError
 from ..models import MazeParams
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
 from .non_perfect import add_loops
-from .pattern42 import make_blocked
+from .pattern42 import close_blocked, make_blocked
 
 
 def choose_orientation(width: int, height: int) -> bool:
@@ -76,7 +76,7 @@ def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
         x, y, direction = random.choice(candidates)
         remove_wall(grid, x, y, direction)
         dx, dy, _ = MOVES[direction]
-        flood(grid, (x + dx, y + dy), visited, blocked)
+        flood(grid, (x + dx, y + dy), visited)
 
 
 def divide_horizontal(
@@ -139,6 +139,7 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
         raise MazeError(msg)
     random.seed(maze_params.seed)
     divide(grid, 0, 0, width, height)
+    close_blocked(grid, blocked)
     repair(grid, blocked)
     if not maze_params.is_perfect:
         loop_ration = random.randint(10, 30)

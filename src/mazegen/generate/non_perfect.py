@@ -40,24 +40,26 @@ def makes_open_area(grid: list[list[int]], x: int, y: int) -> bool:
     height = len(grid)
     for ty in range(y - 2, y + 1):
         for tx in range(x - 2, x + 1):
-            if is_open3x3(grid, tx, ty) and all(
-                (tx >= 0, tx + 2 < width, ty + 2 < height, ty >= 0),
-            ):
+            if tx < 0 or ty < 0 or tx + 2 >= width or ty + 2 >= height:
+                continue
+            if is_open3x3(grid, tx, ty):
                 return True
     return False
 
 
-def add_loops(grid:list[list[int]],blocked:set(tupe(int,int)), count)->None:
-    candidates = wall_candidates(grid,blocked)
+def add_loops(
+    grid: list[list[int]],
+    blocked: set[tuple[int, int]],
+    count: int,
+) -> None:
+    candidates = wall_candidates(grid, blocked)
     random.shuffle(candidates)
     breaked = 0
-    for sell in candidates:
-        x,y,direction = sell
-        remove_wall(grid,x,y,direction)
-        if makes_open_area(grid,x,y):
-            add_wall(grid,x,y,direction)
+    for x, y, direction in candidates:
+        if breaked >= count:
+            return
+        remove_wall(grid, x, y, direction)
+        if makes_open_area(grid, x, y):
+            add_wall(grid, x, y, direction)
         else:
             breaked += 1
-        if count == blocked:
-            return
-    return
