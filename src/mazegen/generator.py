@@ -32,3 +32,4 @@ class MazeGenerator:
         print("generate called")  # ! for dev
         result = generate(self._params)
         print(result)
+        return result

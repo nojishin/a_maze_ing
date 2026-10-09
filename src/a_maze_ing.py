@@ -42,7 +42,8 @@ def main() -> None:
             case "generate" | "g":
                 print("generate called from main")
                 result = maze_generator.generate()
-                render_maze(result)
+                
+                print(render_maze(result))
             case "route" | "r":
                 print("route called from main")
             case "exit" | "e":
