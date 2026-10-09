@@ -3,7 +3,8 @@ from collections import deque
 
 from errors.exceptions import MazeError
 
-from .maze_utils import E, MOVES, N, S, W, add_wall, remove_wall
+from ..models import MazeParams
+from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
 from .non_perfect import add_loops
 from .pattern42 import make_blocked
 
@@ -67,7 +68,7 @@ def find_candidates(
 
 def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
     visited: set[tuple[int, int]] = set()
-    flood(grid, (0, 0), visited, blocked)
+    flood(grid, (0, 0), visited)
     while True:
         candidates = find_candidates(grid, visited, blocked)
         if not candidates:
@@ -128,19 +129,23 @@ def divide(
         divide_vertical(grid, x, y, width, height)
 
 
-def generate(maze_params: MazeParams) -> list[list[int]]:
+def make_result(grid: list[list[int]]) -> str:
+    return "\n".join("".join(f"{cell:X}" for cell in row) for row in grid)
+
+
+def generate(maze_params: MazeParams) -> str:
     width = maze_params.width
     height = maze_params.height
     grid = parse_grid(width, height)
-    blocked = make_blocked(width,height)
+    blocked = make_blocked(width, height)
     if blocked == set():
         msg = "Unable to display 42 patterns."
         raise MazeError(msg)
     random.seed(maze_params.seed)
     divide(grid, 0, 0, width, height)
-    repair(grid,blocked)
+    repair(grid, blocked)
     if not maze_params.is_perfect:
-        loop_ration = random.randint(10,30)
+        loop_ration = random.randint(10, 30)
         count = width * height // loop_ration
-        add_loops(grid,blocked,count)
-    return grid
+        add_loops(grid, blocked, count)
+    return make_result(grid)
