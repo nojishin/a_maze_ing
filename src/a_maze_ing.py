@@ -41,7 +41,7 @@ def main() -> None:
         match cmd:
             case "generate" | "g":
                 print("generate called from main")
-                result = maze_generator.generate
+                result = maze_generator.generate()
                 render_maze(result)
             case "route" | "r":
                 print("route called from main")
