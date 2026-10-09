@@ -1,3 +1,5 @@
+import sys
+
 from errors.exceptions import MazeError
 from errors.handler import error_handler
 from input.maze_config import parse_config
@@ -21,8 +23,34 @@ def main() -> None:
         )
     except MazegenError as e:
         error_handler(e)
-    maze_generator.generate()
+
+    print(
+        "=== A-Maze-ing ===\n"
+        "Commands:\n"
+        "generate (g) : generate a new maze\n"
+        "route    (r) : show / hide the solution path\n"
+        "exit     (e) : quit\n",
+    )
+    while True:
+        try:
+            cmd = input("> ").strip().lower()
+        except EOFError:
+            print()
+            sys.exit(0)
+        match cmd:
+            case "generate" | "g":
+                print("generate called from main")
+            case "route" | "r":
+                print("route called from main")
+            case "exit" | "e":
+                break
+            case _:
+                print(f"Unknown command: '{cmd}'")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print()
+        sys.exit(130)
