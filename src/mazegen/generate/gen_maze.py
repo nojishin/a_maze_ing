@@ -142,7 +142,5 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     close_blocked(grid, blocked)
     repair(grid, blocked)
     if not maze_params.is_perfect:
-        loop_ration = random.randint(10, 30)
-        count = width * height // loop_ration
-        add_loops(grid, blocked, count)
+        add_loops(grid, blocked)
     return grid
