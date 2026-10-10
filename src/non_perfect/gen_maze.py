@@ -4,10 +4,9 @@ from collections import deque
 from errors.exceptions import MazeError
 from visualizer.renderder import render_maze
 
-from ..models import MazeParams
-from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
+from .maze_utils import E, MOVES, N, S, W, add_wall, remove_wall
 from .non_perfect import add_loops
-from .pattern42 import close_blocked, make_blocked
+from .pattern42 import make_blocked
 
 
 def choose_orientation(width: int, height: int) -> bool:
@@ -69,16 +68,15 @@ def find_candidates(
 
 def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
     visited: set[tuple[int, int]] = set()
-    flood(grid, (0, 0), visited)
+    flood(grid, (0, 0), visited, blocked)
     while True:
         candidates = find_candidates(grid, visited, blocked)
         if not candidates:
             return
         x, y, direction = random.choice(candidates)
         remove_wall(grid, x, y, direction)
-        print(f"\n{render_maze(grid)}")
         dx, dy, _ = MOVES[direction]
-        flood(grid, (x + dx, y + dy), visited)
+        flood(grid, (x + dx, y + dy), visited, blocked)
 
 
 def divide_horizontal(
@@ -96,7 +94,6 @@ def divide_horizontal(
         add_wall(grid, col, wall_y, S)
         print(f"\n{render_maze(grid)}")  # ! test
         pass
-
     divide(grid, x, y, width, wall_y - y + 1)
     divide(grid, x, wall_y + 1, width, y + height - wall_y - 1)
 
@@ -140,19 +137,15 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     width = maze_params.width
     height = maze_params.height
     grid = parse_grid(width, height)
-    blocked = make_blocked(width, height)
+    blocked = make_blocked(width,height)
     if blocked == set():
         msg = "Unable to display 42 patterns."
         raise MazeError(msg)
     random.seed(maze_params.seed)
-    print(f"\n{render_maze(grid)}")
     divide(grid, 0, 0, width, height)
-    print(f"\n{render_maze(grid)}")
-    close_blocked(grid, blocked)
-    print(f"\n{render_maze(grid)}")
-    repair(grid, blocked)
+    repair(grid,blocked)
     if not maze_params.is_perfect:
-        loop_ration = random.randint(10, 30)
+        loop_ration = random.randint(10,30)
         count = width * height // loop_ration
-        add_loops(grid, blocked, count)
+        add_loops(grid,blocked,count)
     return grid

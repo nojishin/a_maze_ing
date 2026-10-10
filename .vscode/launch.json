@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: a_maze_ing.py",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/a_maze_ing.py",
+      "python": "${workspaceFolder}/src/.venv/bin/python",
+      "cwd": "${workspaceFolder}/src",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args":["config.txt"]
+    },
+  ]
+}

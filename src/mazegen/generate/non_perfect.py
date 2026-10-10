@@ -1,6 +1,7 @@
 import random
 
 from .maze_utils import MOVES, E, S, add_wall, remove_wall
+from visualizer.renderder import render_maze
 
 
 def wall_candidates(
@@ -61,5 +62,7 @@ def add_loops(
         remove_wall(grid, x, y, direction)
         if makes_open_area(grid, x, y):
             add_wall(grid, x, y, direction)
+            print(f"\n{render_maze(grid)}") # ! test
+            pass
         else:
             breaked += 1

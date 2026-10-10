@@ -31,5 +31,5 @@ class MazeGenerator:
     def generate(self) -> list[list[int]]:
         print("generate called")  # ! for dev
         result = generate(self._params)
-        print(result)
+        # print(result)
         return result

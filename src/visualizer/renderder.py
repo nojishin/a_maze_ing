@@ -27,9 +27,6 @@ def _build_wall_grids(
             if cell & (1 << WEST_BIT):
                 v_wall[y][x] = True
 
-    print("h_wall:\n", h_wall)
-    print("v_wall:\n", v_wall)
-
     return h_wall, v_wall
 
 
