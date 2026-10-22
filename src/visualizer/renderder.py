@@ -56,4 +56,30 @@ def render_maze(grid: list[list[int]]) -> str:
             if v_wall[row][col]:
                 canvas[2 * row + 1][2 * col] = WALL
 
-    return "\n".join("".join(row) for row in canvas)
+    # result = "\n".join("".join(row) for row in canvas)
+    lines = []
+
+    grid_y = 0
+    digit_row_size = len(str(height))
+    for i, row in enumerate(canvas):
+        label = ""
+        if i % 2 == 1:
+            label = f"{grid_y!s:>{digit_row_size}} "
+            grid_y += 1
+        else:
+            label = " " * (digit_row_size + 1)
+        lines.append(label + "".join(row))
+
+    digit_col_size = 2
+    label = " " * (digit_row_size + 1)
+    grid_x = 0
+    for i in range(len(canvas[0])):
+        if i % 2 == 1:
+            label += f"{(grid_x % 100)!s:<{digit_col_size}}"
+            grid_x += 1
+        else:
+            label += " " * (digit_col_size)
+
+    label += "\n"
+
+    return label + "\n".join(lines)
