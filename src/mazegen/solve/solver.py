@@ -1,8 +1,8 @@
 from collections import deque
-from dataclasses import dataclass
 from itertools import pairwise
 
 from mazegen.errors import PathNotFoundError
+from mazegen.models import PathResult
 
 N = 0b0001
 E = 0b0010
@@ -15,10 +15,6 @@ DELTA_TO_DIR = {(0, -1): "N", (1, 0): "E", (0, 1): "S", (-1, 0): "W"}
 Coord = tuple[int, int]
 
 
-@dataclass
-class PathResult:
-    path: list[tuple[int, int]]
-    directions: str
 
 
 def solve(
@@ -65,5 +61,4 @@ def solve(
         DELTA_TO_DIR[(b[0] - a[0], b[1] - a[1])] for a, b in pairwise(path)
     )
 
-    print("path:", path, "\ndirection:", direction)  # ! for test
-    return PathResult(path=path, directions=direction)
+    return PathResult(coord=path, directions=direction)

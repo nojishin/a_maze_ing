@@ -27,3 +27,13 @@ class ParamsValidationError(MazegenError):
             _format_error(error) for error in validation_error.errors()
         )
         super().__init__("\n".join(lines))
+
+
+class PathNotFoundError(MazegenError):
+    def __init__(self) -> None:
+        super().__init__("Path not found")
+
+
+class MazeNotGeneratedError(MazegenError):
+    def __init__(self) -> None:
+        super().__init__("Maze not generated. Call generate() first.")
