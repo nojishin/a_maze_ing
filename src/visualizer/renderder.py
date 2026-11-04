@@ -36,7 +36,7 @@ def _build_wall_grids(
 def render_maze(
     grid: list[list[int]],
     entry: tuple[int, int],
-    exit: tuple[int, int],
+    exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
     path: list[tuple[int, int]] | None = None,
 ) -> str:
     height = len(grid)

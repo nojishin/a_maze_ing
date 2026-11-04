@@ -10,7 +10,7 @@ from visualizer.renderder import render_maze
 def print_maze(
     grid: list[list[int]],
     entry: tuple[int, int],
-    exit: tuple[int, int],
+    exit: tuple[int, int], # noqa: A002 - pairs with `entry`
     path: list[tuple[int, int]],
     show_path: bool,
 ) -> None:
