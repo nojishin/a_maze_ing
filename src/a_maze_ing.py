@@ -8,9 +8,10 @@ from visualizer.renderder import render_maze
 
 
 def print_maze(
+    *,
     grid: list[list[int]],
     entry: tuple[int, int],
-    exit: tuple[int, int], # noqa: A002 - pairs with `entry`
+    exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
     path: list[tuple[int, int]],
     show_path: bool,
 ) -> None:
@@ -57,11 +58,11 @@ def main() -> None:
                 result = maze_generator.generate()
                 path = maze_generator.solve()
                 print_maze(
-                    result,
-                    config.entry,
-                    config.exit,
-                    path.coord,
-                    show_path,
+                    grid=result,
+                    entry=config.entry,
+                    exit=config.exit,
+                    path=path.coord,
+                    show_path=show_path,
                 )
             case "path" | "p":
                 if show_path:
