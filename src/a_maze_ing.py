@@ -4,6 +4,20 @@ from errors.exceptions import MazeError
 from errors.handler import error_handler
 from input.maze_config import parse_config
 from mazegen import MazeGenerator, MazegenError
+from visualizer.renderder import render_maze
+
+
+def print_maze(
+    grid: list[list[int]],
+    entry: tuple[int, int],
+    exit: tuple[int, int],
+    path: list[tuple[int, int]],
+    show_path: bool,
+) -> None:
+    if show_path:
+        print(render_maze(grid, entry, exit, path))
+    else:
+        print(render_maze(grid, entry, exit))
 
 
 def main() -> None:
@@ -28,9 +42,10 @@ def main() -> None:
         "=== A-Maze-ing ===\n"
         "Commands:\n"
         "generate (g) : generate a new maze\n"
-        "route    (r) : show / hide the solution path\n"
-        "exit     (e) : quit\n",
+        "path     (p) : show / hide the solution path\n"
+        "exit     (q) : quit\n",
     )
+    show_path = True
     while True:
         try:
             cmd = input("> ").strip().lower()
@@ -39,10 +54,23 @@ def main() -> None:
             sys.exit(0)
         match cmd:
             case "generate" | "g":
-                print("generate called from main")
-            case "route" | "r":
-                print("route called from main")
-            case "exit" | "e":
+                result = maze_generator.generate()
+                path = maze_generator.solve()
+                print_maze(
+                    result,
+                    config.entry,
+                    config.exit,
+                    path.coord,
+                    show_path,
+                )
+            case "path" | "p":
+                if show_path:
+                    show_path = False
+                    print("Solution path: hidden")
+                else:
+                    show_path = True
+                    print("Solution path: shown")
+            case "exit" | "q":
                 break
             case _:
                 print(f"Unknown command: '{cmd}'")
