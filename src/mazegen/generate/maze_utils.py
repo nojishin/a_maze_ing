@@ -7,12 +7,30 @@ MOVES = {N: (0, -1, S), E: (1, 0, W), S: (0, 1, N), W: (-1, 0, E)}
 
 
 def add_wall(grid: list[list[int]], x: int, y: int, direction: int) -> None:
+    """Add a wall on both sides of a cell edge.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        x: Column of the cell.
+        y: Row of the cell.
+        direction: Side of the cell to close (``N``, ``E``, ``S`` or ``W``).
+
+    """
     grid[y][x] |= direction
     dx, dy, opposite = MOVES[direction]
     grid[y + dy][x + dx] |= opposite
 
 
 def remove_wall(grid: list[list[int]], x: int, y: int, direction: int) -> None:
+    """Remove a wall from both sides of a cell edge.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        x: Column of the cell.
+        y: Row of the cell.
+        direction: Side of the cell to open (``N``, ``E``, ``S`` or ``W``).
+
+    """
     grid[y][x] &= ~direction
     dx, dy, opposite = MOVES[direction]
     grid[y + dy][x + dx] &= ~opposite
