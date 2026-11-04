@@ -233,7 +233,8 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
         A grid of wall bitmasks, indexed as ``grid[y][x]``.
 
     Raises:
-        MazeError: If the maze is too small to display the 42 pattern.
+        MazeError: If the maze is too small to display the 42 pattern, or if
+            the entry or exit overlaps it.
 
     """
     width = maze_params.width
@@ -242,6 +243,9 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     blocked = make_blocked(width, height)
     if blocked == set():
         msg = "Unable to display 42 patterns."
+        raise MazeError(msg)
+    if maze_params.entry in blocked or maze_params.exit in blocked:
+        msg = "ENTRY or EXIT overlaps the 42 pattern."
         raise MazeError(msg)
     random.seed(maze_params.seed)
     divide(grid, 0, 0, width, height)
