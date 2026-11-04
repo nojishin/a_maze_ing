@@ -33,7 +33,9 @@ def make_blocked(width: int, height: int) -> set[tuple[int, int]]:
     return blocked
 
 
-def close_blocked(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+def close_blocked(
+    grid: list[list[int]], blocked: set[tuple[int, int]],
+) -> None:
     """Close all four walls of every cell of the 42 pattern.
 
     Args:
