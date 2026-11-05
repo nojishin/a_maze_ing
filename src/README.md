@@ -130,9 +130,11 @@ def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 |---|---|---|
 | shshimiz | 迷路生成アルゴリズム（Recursive Division）、nonperfect迷路の生成 | `mazegen/generate/` |
 | snoji | 設定ファイルの読み込みと検証、エラー処理、`MazeGenerator` の設計、迷路の描画、対話式コマンド、パッケージ化と開発環境の整備 | `input/`, `models/`, `errors/`, `mazegen/generator.py`, `visualizer/`, `pyproject.toml` |
-###　うまくいった点と改善できる点
+### 計画と実際の進み方
 
-###　使用したツール
+### うまくいった点と改善できる点
+
+### 使用したツール
 
 ## Resources
 ### 参考資料
