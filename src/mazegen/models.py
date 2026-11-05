@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from typing import Annotated, Self
 
 from pydantic import BaseModel, Field, model_validator
 
 MazeSize = Annotated[int, Field(ge=1, le=100)]
-MazeCoord = Annotated[int, Field(ge=1, le=99)]
+MazeCoord = Annotated[int, Field(ge=0, le=99)]
 
 
 class MazeParams(BaseModel):
@@ -53,3 +54,9 @@ class MazeParams(BaseModel):
         if errors:
             raise ValueError(", ".join(errors))
         return self
+
+
+@dataclass
+class PathResult:
+    coord: list[tuple[int, int]]
+    directions: str

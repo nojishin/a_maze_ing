@@ -1,7 +1,9 @@
 from pydantic import ValidationError
 
-from .errors import ParamsValidationError
-from .models import MazeParams
+from .errors import MazeNotGeneratedError, ParamsValidationError
+from .generate.gen_maze import generate
+from .models import MazeParams, PathResult
+from .solve.solver import solve
 
 
 class MazeGenerator:
@@ -26,6 +28,13 @@ class MazeGenerator:
             )
         except ValidationError as e:
             raise ParamsValidationError(e) from e
+        self._grid: list[list[int]] | None = None
 
-    def generate(self) -> None:
-        print("generate called")  # ! for dev
+    def generate(self) -> list[list[int]]:
+        self._grid = generate(self._params)
+        return self._grid
+
+    def solve(self) -> PathResult:
+        if self._grid is None:
+            raise MazeNotGeneratedError
+        return solve(self._grid, self._params.entry, self._params.exit)
