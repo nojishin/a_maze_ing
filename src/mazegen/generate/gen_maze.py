@@ -10,6 +10,19 @@ from .pattern42 import close_blocked, make_blocked
 
 
 def choose_orientation(width: int, height: int) -> bool:
+    """Choose the orientation of the next dividing wall.
+
+    The wall is placed across the longer side of the area. If the area is
+    square, the orientation is chosen at random.
+
+    Args:
+        width: Width of the area in cells.
+        height: Height of the area in cells.
+
+    Returns:
+        True for a horizontal wall, False for a vertical wall.
+
+    """
     if width < height:
         return True
     if width > height:
@@ -18,6 +31,16 @@ def choose_orientation(width: int, height: int) -> bool:
 
 
 def parse_grid(width: int, height: int) -> list[list[int]]:
+    """Create a grid whose only walls are the outer border.
+
+    Args:
+        width: Maze width in cells.
+        height: Maze height in cells.
+
+    Returns:
+        A grid of wall bitmasks, indexed as ``grid[y][x]``.
+
+    """
     grid = [[0] * width for _ in range(height)]
     for x in range(width):
         grid[0][x] |= N
@@ -33,6 +56,15 @@ def flood(
     start: tuple[int, int],
     visited: set[tuple[int, int]],
 ) -> None:
+    """Mark every cell reachable from a start cell, using BFS.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        start: The ``(x, y)`` cell to start from.
+        visited: Set of reached cells, updated in place. Cells already in it
+            are not explored again.
+
+    """
     queue = deque([start])
     visited.add(start)
     while queue:
@@ -52,6 +84,18 @@ def find_candidates(
     visited: set[tuple[int, int]],
     blocked: set[tuple[int, int]],
 ) -> list[tuple[int, int, int]]:
+    """Find the walls that separate reached cells from unreached ones.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        visited: Cells already reached.
+        blocked: Cells reserved for the 42 pattern.
+
+    Returns:
+        An ``(x, y, direction)`` tuple for each wall between a visited cell and
+        an unvisited, unblocked cell inside the maze.
+
+    """
     height = len(grid)
     width = len(grid[0])
     candidates = []
@@ -67,6 +111,16 @@ def find_candidates(
 
 
 def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+    """Reconnect all cells outside the 42 pattern, in place.
+
+    Starting from ``(0, 0)``, a random wall on the edge of the reached region
+    is removed until no unreached cell remains.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        blocked: Cells reserved for the 42 pattern.
+
+    """
     visited: set[tuple[int, int]] = set()
     flood(grid, (0, 0), visited)
     while True:
@@ -86,6 +140,18 @@ def divide_horizontal(
     width: int,
     height: int,
 ) -> None:
+    """Split an area with a horizontal wall, then divide both parts.
+
+    The wall has one random passage in it.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        x: Column of the left edge of the area.
+        y: Row of the top edge of the area.
+        width: Width of the area in cells.
+        height: Height of the area in cells.
+
+    """
     wall_y = y + random.randint(0, height - 2)
     passage_x = random.randint(x, x + width - 1)
     for col in range(x, x + width):
@@ -103,6 +169,18 @@ def divide_vertical(
     width: int,
     height: int,
 ) -> None:
+    """Split an area with a vertical wall, then divide both parts.
+
+    The wall has one random passage in it.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        x: Column of the left edge of the area.
+        y: Row of the top edge of the area.
+        width: Width of the area in cells.
+        height: Height of the area in cells.
+
+    """
     wall_x = x + random.randint(0, width - 2)
     passage_y = random.randint(y, y + height - 1)
     for row in range(y, y + height):
@@ -120,6 +198,18 @@ def divide(
     width: int,
     height: int,
 ) -> None:
+    """Divide an area recursively until it is too small to split.
+
+    Recursion stops when the width or height of the area is less than 2.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        x: Column of the left edge of the area.
+        y: Row of the top edge of the area.
+        width: Width of the area in cells.
+        height: Height of the area in cells.
+
+    """
     if width < 2 or height < 2:
         return
     is_horizontal = choose_orientation(width, height)
@@ -130,12 +220,32 @@ def divide(
 
 
 def generate(maze_params: MazeParams) -> list[list[int]]:
+    """Generate a maze containing the 42 pattern.
+
+    The maze is built by recursive division. The 42 pattern is then closed off
+    and the remaining cells are reconnected. Loops are added if the maze is not
+    perfect.
+
+    Args:
+        maze_params: Size, seed and perfection settings of the maze.
+
+    Returns:
+        A grid of wall bitmasks, indexed as ``grid[y][x]``.
+
+    Raises:
+        MazeError: If the maze is too small to display the 42 pattern, or if
+            the entry or exit overlaps it.
+
+    """
     width = maze_params.width
     height = maze_params.height
     grid = parse_grid(width, height)
     blocked = make_blocked(width, height)
     if blocked == set():
         msg = "Unable to display 42 patterns."
+        raise MazeError(msg)
+    if maze_params.entry in blocked or maze_params.exit in blocked:
+        msg = "ENTRY or EXIT overlaps the 42 pattern."
         raise MazeError(msg)
     random.seed(maze_params.seed)
     divide(grid, 0, 0, width, height)
