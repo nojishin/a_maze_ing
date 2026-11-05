@@ -1,7 +1,7 @@
 import random
 from collections import deque
 
-from errors.exceptions import MazeError
+from errors.exceptions import MazeGenError
 
 from ..models import MazeParams
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
@@ -136,7 +136,7 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     blocked = make_blocked(width, height)
     if blocked == set():
         msg = "Unable to display 42 patterns."
-        raise MazeError(msg)
+        raise MazeGenError(msg)
     random.seed(maze_params.seed)
     divide(grid, 0, 0, width, height)
     close_blocked(grid, blocked)
