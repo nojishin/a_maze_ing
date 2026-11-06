@@ -8,6 +8,12 @@ PATTERN = [
     "..X.XXX",
 ]
 
+PATTERN_WIDTH = len(PATTERN[0])
+PATTERN_HEIGHT = len(PATTERN)
+PATTERN_MARGIN = 1
+MIN_WIDTH = PATTERN_WIDTH + 2 * PATTERN_MARGIN
+MIN_HEIGHT = PATTERN_HEIGHT + 2 * PATTERN_MARGIN
+
 
 def make_blocked(width: int, height: int) -> set[tuple[int, int]]:
     """Compute the cells of the 42 pattern, centered in the maze.
@@ -21,10 +27,10 @@ def make_blocked(width: int, height: int) -> set[tuple[int, int]]:
         smaller than 9x7 and cannot display it.
 
     """
-    if width < 9 or height < 7:
+    if width < MIN_WIDTH or height < MIN_HEIGHT:
         return set()
-    offset_x = (width - 7) // 2
-    offset_y = (height - 5) // 2
+    offset_x = (width - PATTERN_WIDTH) // 2
+    offset_y = (height - PATTERN_HEIGHT) // 2
     blocked: set[tuple[int, int]] = set()
     for j, line in enumerate(PATTERN):
         for i, char in enumerate(line):
