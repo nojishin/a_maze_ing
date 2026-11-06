@@ -141,7 +141,11 @@ Support multiple maze generation algorithms.
 ### うまくいった点と改善できる点
 
 ### 使用したツール
-
+claude ai
 ## Resources
 ### 参考資料
+- [Maze algorithms](https://www.jamisbuck.org/mazes/)
 ### AIの利用
+shshimiz
+
+snoji
