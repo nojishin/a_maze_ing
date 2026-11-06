@@ -39,6 +39,20 @@ def render_maze(
     exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
     path: list[tuple[int, int]] | None = None,
 ) -> str:
+    """Render the maze as a string with ANSI colors.
+
+    Row and column numbers are drawn along the edges.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        entry: The ``(x, y)`` entry cell.
+        exit: The ``(x, y)`` exit cell.
+        path: Cells of the solution path to draw, or ``None`` to hide it.
+
+    Returns:
+        The rendered maze.
+
+    """
     height = len(grid)
     width = len(grid[0])
     h_wall, v_wall = _build_wall_grids(grid)

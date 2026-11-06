@@ -40,6 +40,8 @@ def _parse_output_file(value: str) -> str:
 
 
 class Config(BaseModel):
+    """Validated values of the config file."""
+
     model_config = ConfigDict(alias_generator=str.upper, extra="forbid")
 
     width: MazeSize
@@ -52,6 +54,12 @@ class Config(BaseModel):
 
     @model_validator(mode="after")
     def check_entry_exit_differ(self) -> Self:
+        """Check that the entry and the exit are different cells.
+
+        Raises:
+            ValueError: If they are the same cell.
+
+        """
         if self.entry == self.exit:
             msg = "ENTRY and EXIT must be different"
             raise ValueError(msg)
@@ -59,6 +67,12 @@ class Config(BaseModel):
 
     @model_validator(mode="after")
     def check_entry_exit_in_bounds(self) -> Self:
+        """Check that the entry and the exit are inside the maze.
+
+        Raises:
+            ValueError: If either one is outside the maze.
+
+        """
         def _is_out_of_bounds(
             width: int,
             height: int,

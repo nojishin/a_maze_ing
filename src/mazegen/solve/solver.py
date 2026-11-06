@@ -22,6 +22,20 @@ def solve(
     start: Coord,
     goal: Coord,
 ) -> PathResult:
+    """Find the shortest path between two cells, using BFS.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        start: The ``(x, y)`` start cell.
+        goal: The ``(x, y)`` goal cell.
+
+    Returns:
+        The path cells and directions.
+
+    Raises:
+        PathNotFoundError: If the goal cannot be reached.
+
+    """
     h, w = len(grid), len(grid[0])
     prev: list[list[Coord | None]] = [[None] * w for _ in range(h)]
     sx, sy = start
