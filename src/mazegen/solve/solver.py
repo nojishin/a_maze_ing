@@ -60,7 +60,6 @@ def solve(
             que.append((nx, ny))
     if prev[gy][gx] is None:
         raise PathNotFoundError
-    # print(f"path: {prev}")
 
     path = [goal]
     while path[-1] != start:
