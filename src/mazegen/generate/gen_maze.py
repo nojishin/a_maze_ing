@@ -2,8 +2,8 @@ import random
 from collections import deque
 
 from errors.exceptions import MazeError
+from mazegen.models import MazeParams
 
-from ..models import MazeParams
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
 from .non_perfect import add_loops
 from .pattern42 import close_blocked, make_blocked
