@@ -1,7 +1,7 @@
 import random
 from collections import deque
 
-from errors.exceptions import MazeGenError
+from errors.exceptions import MazeError
 
 from ..models import MazeParams
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
