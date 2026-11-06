@@ -117,3 +117,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print()
         sys.exit(130)
+    except Exception as e:  # noqa: BLE001 - for subject
+        print(str(e))
+        sys.exit(1)
