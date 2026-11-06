@@ -45,7 +45,9 @@ SEEDのみ任意。
 ### 採用したアルゴリズム
     Recursive Divison
 ### 選んだ理由
-- 
+- よくある迷路生成のアルゴリズムBacktrackingとは別のアルゴリズムで実装しようと考えていた。
+- 壁がないところから迷路を生成するアルゴリズムをやろうと思っていたから。
+- 面白そうだったから
 ### 迷路生成の流れ
 Recursive Divisionで迷路を作り、そのあとで42パターンの配置と経路の調整をします。
 
@@ -131,7 +133,11 @@ def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 | shshimiz | 迷路生成アルゴリズム（Recursive Division）、nonperfect迷路の生成 | `mazegen/generate/` |
 | snoji | 設定ファイルの読み込みと検証、エラー処理、`MazeGenerator` の設計、迷路の描画、対話式コマンド、パッケージ化と開発環境の整備 | `input/`, `models/`, `errors/`, `mazegen/generator.py`, `visualizer/`, `pyproject.toml` |
 ### 計画と実際の進み方
-
+当初の計画ではPARFECT=True,Falseでアルゴリズムを変えてBonusまで実装する計画だったが、subjectの
+```txt
+Support multiple maze generation algorithms.
+```
+から各アルゴリズムを両方の場合で切り替えることができないとBonusに含まれないのではないかと判断し実装をやめた
 ### うまくいった点と改善できる点
 
 ### 使用したツール
