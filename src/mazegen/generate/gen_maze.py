@@ -136,7 +136,7 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     blocked = make_blocked(width, height)
     if blocked == set():
         msg = "Unable to display 42 patterns."
-        raise MazeGenError(msg)
+        raise MazeError(msg)
     random.seed(maze_params.seed)
     divide(grid, 0, 0, width, height)
     close_blocked(grid, blocked)
