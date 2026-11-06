@@ -1,5 +1,5 @@
-from .errors import MazegenError
-from .generator import MazeGenerator, ParamsValidationError
+from .errors import MazegenError, ParamsValidationError
+from .generator import MazeGenerator
 from .models import PathResult
 
 __all__ = [

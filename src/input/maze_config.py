@@ -59,6 +59,15 @@ def _ensure_output_differs_from_config(
 
 
 def parse_config() -> Config:
+    """Read, parse and validate the config file given on the command line.
+
+    Returns:
+        The validated config.
+
+    Raises:
+        MazeError: If the arguments, the file or its values are invalid.
+
+    """
     config_path = get_config_path()
     config_text = _read_config_file(config_path)
     config_dict = _extract_dict(config_text)

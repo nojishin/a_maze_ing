@@ -8,6 +8,8 @@ MazeCoord = Annotated[int, Field(ge=0, le=99)]
 
 
 class MazeParams(BaseModel):
+    """Validated parameters of a maze."""
+
     width: MazeSize
     height: MazeSize
     entry: tuple[MazeCoord, MazeCoord]
@@ -17,6 +19,12 @@ class MazeParams(BaseModel):
 
     @model_validator(mode="after")
     def check_entry_exit_differ(self) -> Self:
+        """Check that the entry and the exit are different cells.
+
+        Raises:
+            ValueError: If they are the same cell.
+
+        """
         if self.entry == self.exit:
             msg = "ENTRY and EXIT must be different"
             raise ValueError(msg)
@@ -24,6 +32,12 @@ class MazeParams(BaseModel):
 
     @model_validator(mode="after")
     def check_entry_exit_in_bounds(self) -> Self:
+        """Check that the entry and the exit are inside the maze.
+
+        Raises:
+            ValueError: If either one is outside the maze.
+
+        """
         def _is_out_of_bounds(
             width: int,
             height: int,
@@ -58,5 +72,13 @@ class MazeParams(BaseModel):
 
 @dataclass
 class PathResult:
+    """Solution path of a maze.
+
+    Attributes:
+        coord: The ``(x, y)`` cells of the path, from entry to exit.
+        directions: The moves of the path as ``N``, ``E``, ``S`` and ``W``.
+
+    """
+
     coord: list[tuple[int, int]]
     directions: str

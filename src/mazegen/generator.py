@@ -7,6 +7,8 @@ from .solve.solver import solve
 
 
 class MazeGenerator:
+    """Generate a maze and find its solution path."""
+
     def __init__(  # noqa: PLR0913 - public API, mirrors MazeParams fields
         self,
         *,
@@ -17,6 +19,20 @@ class MazeGenerator:
         is_perfect: bool,
         seed: int | None = None,
     ) -> None:
+        """Validate and store the maze parameters.
+
+        Args:
+            width: Maze width in cells.
+            height: Maze height in cells.
+            entry: The ``(x, y)`` entry cell.
+            exit: The ``(x, y)`` exit cell.
+            is_perfect: Whether exactly one path joins any two cells.
+            seed: Random seed. ``None`` gives a different maze each time.
+
+        Raises:
+            ParamsValidationError: If a parameter is invalid.
+
+        """
         try:
             self._params = MazeParams(
                 width=width,
@@ -31,10 +47,26 @@ class MazeGenerator:
         self._grid: list[list[int]] | None = None
 
     def generate(self) -> list[list[int]]:
+        """Generate a new maze.
+
+        Returns:
+            A grid of wall bitmasks, indexed as ``grid[y][x]``.
+
+        """
         self._grid = generate(self._params)
         return self._grid
 
     def solve(self) -> PathResult:
+        """Find the shortest path from the entry to the exit.
+
+        Returns:
+            The path cells and directions.
+
+        Raises:
+            MazeNotGeneratedError: If ``generate()`` has not been called.
+            PathNotFoundError: If the exit cannot be reached.
+
+        """
         if self._grid is None:
             raise MazeNotGeneratedError
         return solve(self._grid, self._params.entry, self._params.exit)

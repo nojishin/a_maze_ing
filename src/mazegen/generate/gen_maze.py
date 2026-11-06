@@ -2,11 +2,13 @@ import random
 from collections import deque
 
 from errors.exceptions import MazeError
+from mazegen.models import MazeParams
 
-from ..models import MazeParams
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
 from .non_perfect import add_loops
 from .pattern42 import close_blocked, make_blocked
+
+MIN_DIVIDE_SIZE = 2
 
 
 def choose_orientation(width: int, height: int) -> bool:
@@ -210,7 +212,7 @@ def divide(
         height: Height of the area in cells.
 
     """
-    if width < 2 or height < 2:
+    if width < MIN_DIVIDE_SIZE or height < MIN_DIVIDE_SIZE:
         return
     is_horizontal = choose_orientation(width, height)
     if is_horizontal:

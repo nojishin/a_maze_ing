@@ -16,6 +16,16 @@ def print_maze(
     path: list[tuple[int, int]],
     show_path: bool,
 ) -> None:
+    """Print the maze to the terminal.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        entry: The ``(x, y)`` entry cell.
+        exit: The ``(x, y)`` exit cell.
+        path: Cells of the solution path, from entry to exit.
+        show_path: Whether to draw the solution path.
+
+    """
     if show_path:
         print(render_maze(grid, entry, exit, path))
     else:
@@ -30,6 +40,23 @@ def write_file(
     exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
     directions: str,
 ) -> None:
+    """Write the maze, entry, exit and solution to the output file.
+
+    The grid is written one row per line, with each cell as a hex digit,
+    followed by an empty line, the entry, the exit and the path directions.
+
+    Args:
+        output_file: Path of the file to write.
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        entry: The ``(x, y)`` entry cell.
+        exit: The ``(x, y)`` exit cell.
+        directions: The solution path as a string of ``N``, ``E``, ``S``
+            and ``W``.
+
+    Raises:
+        OutputFileWriteError: If the file cannot be written.
+
+    """
     texts: list[str] = [
         *("".join(f"{v:x}" for v in row) for row in grid),
         "",
@@ -46,6 +73,11 @@ def write_file(
 
 
 def main() -> None:
+    """Read the config, then run the interactive command loop.
+
+    Errors are printed and the program exits with status 1.
+
+    """
     try:
         config = parse_config()
     except MazeError as e:

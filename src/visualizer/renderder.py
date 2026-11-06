@@ -33,12 +33,7 @@ def _build_wall_grids(
     return h_wall, v_wall
 
 
-def render_maze(
-    grid: list[list[int]],
-    entry: tuple[int, int],
-    exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
-    path: list[tuple[int, int]] | None = None,
-) -> str:
+def _draw_walls(grid: list[list[int]]) -> list[list[str]]:
     height = len(grid)
     width = len(grid[0])
     h_wall, v_wall = _build_wall_grids(grid)
@@ -63,7 +58,15 @@ def render_maze(
         for col in range(width + 1):
             if v_wall[row][col]:
                 canvas[2 * row + 1][2 * col] = WALL
+    return canvas
 
+
+def _draw_markers(
+    canvas: list[list[str]],
+    entry: tuple[int, int],
+    exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
+    path: list[tuple[int, int]] | None,
+) -> None:
     if path is not None:
         for x, y in path:
             canvas[1 + y * 2][1 + x * 2] = PATH
@@ -73,9 +76,12 @@ def render_maze(
     eix, eiy = exit
     canvas[1 + eiy * 2][1 + eix * 2] = EXIT
 
+
+def _add_labels(canvas: list[list[str]]) -> str:
     lines = []
 
     grid_y = 0
+    height = len(canvas) // 2
     digit_row_size = len(str(height))
     for i, r in enumerate(canvas):
         label = ""
@@ -97,5 +103,29 @@ def render_maze(
             label += " " * (digit_col_size)
 
     label += "\n"
-
     return label + "\n".join(lines)
+
+
+def render_maze(
+    grid: list[list[int]],
+    entry: tuple[int, int],
+    exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
+    path: list[tuple[int, int]] | None = None,
+) -> str:
+    """Render the maze as a string with ANSI colors.
+
+    Row and column numbers are drawn along the edges.
+
+    Args:
+        grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
+        entry: The ``(x, y)`` entry cell.
+        exit: The ``(x, y)`` exit cell.
+        path: Cells of the solution path to draw, or ``None`` to hide it.
+
+    Returns:
+        The rendered maze.
+
+    """
+    canvas = _draw_walls(grid)
+    _draw_markers(canvas, entry, exit, path)
+    return _add_labels(canvas)
