@@ -17,7 +17,7 @@ class InvalidArgumentsCountError(MazeError):
 
 class ConfigFileNotFoundError(MazeError):
     def __init__(self, file_path: Path) -> None:
-        super().__init__(f"Config File not found: {file_path!r}")
+        super().__init__(f"Config file not found: {file_path!r}")
 
 
 class ConfigFileReadError(MazeError):
@@ -28,6 +28,13 @@ class ConfigFileReadError(MazeError):
 class ConfigFileFormatError(MazeError):
     def __init__(self, line: str) -> None:
         super().__init__(f"Invalid config file format {line!r}")
+
+
+class OutputFileWriteError(MazeError):
+    def __init__(self, file_path: Path, reason: str) -> None:
+        super().__init__(
+            f"Failed to write output file {file_path!r}: {reason}",
+        )
 
 
 class ConfigDuplicateKeyError(MazeError):

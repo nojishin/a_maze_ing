@@ -36,6 +36,8 @@ ignore = [
     "D213", # conflicts with D212
     "CPY001", # no copyright notice needed for a school project
     "T201", # intentional CLI output, not debug leftovers
+    "S311", # random is for maze generation, not cryptography
+
 ]
 unfixable = [
     "F401", # unused import
