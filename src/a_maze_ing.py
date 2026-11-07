@@ -4,7 +4,7 @@ from pathlib import Path
 from errors.exceptions import MazeError, OutputFileWriteError
 from errors.handler import error_handler
 from input.maze_config import parse_config
-from mazegen import MazeGenerator, MazegenError
+from mazegen import MazeGenerator, MazeGenError
 from visualizer.renderder import render_maze
 
 
@@ -92,7 +92,7 @@ def main() -> None:
             is_perfect=config.is_perfect,
             seed=config.seed,
         )
-    except MazegenError as e:
+    except MazeGenError as e:
         error_handler(e)
 
     print(
@@ -139,7 +139,7 @@ def main() -> None:
                     break
                 case _:
                     print(f"Unknown command: '{cmd}'")
-    except (MazeError, MazegenError) as e:
+    except (MazeError, MazeGenError) as e:
         error_handler(e)
 
 

@@ -2,7 +2,7 @@ from pydantic import ValidationError
 from pydantic_core import ErrorDetails
 
 
-class MazegenError(Exception):
+class MazeGenError(Exception):
     """Base class for errors raised by the mazegen package."""
 
 
@@ -21,7 +21,7 @@ def _format_error(error: ErrorDetails) -> str:
     return message
 
 
-class ParamsValidationError(MazegenError):
+class ParamsValidationError(MazeGenError):
     """Raised when maze parameters fail validation."""
 
     def __init__(self, validation_error: ValidationError) -> None:
@@ -38,7 +38,7 @@ class ParamsValidationError(MazegenError):
         super().__init__("\n".join(lines))
 
 
-class PathNotFoundError(MazegenError):
+class PathNotFoundError(MazeGenError):
     """Raised when no path connects the entry and the exit."""
 
     def __init__(self) -> None:
@@ -46,7 +46,7 @@ class PathNotFoundError(MazegenError):
         super().__init__("Path not found")
 
 
-class MazeNotGeneratedError(MazegenError):
+class MazeNotGeneratedError(MazeGenError):
     """Raised when the maze is solved before it is generated."""
 
     def __init__(self) -> None:
