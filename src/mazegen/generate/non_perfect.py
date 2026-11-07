@@ -3,6 +3,7 @@ import random
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
 
 DEAD_END_WALLS = 3
+OPEN_AREA_SIZE = 3
 
 
 def is_dead_end(
@@ -26,8 +27,8 @@ def is_dead_end(
     return (x, y) not in blocked and grid[y][x].bit_count() == DEAD_END_WALLS
 
 
-def is_open_2x2(grid: list[list[int]], tx: int, ty: int) -> bool:
-    """Check whether a 2x2 area has no walls inside it.
+def is_open_area(grid: list[list[int]], tx: int, ty: int) -> bool:
+    """Check whether a 3x3 area has no walls inside it.
 
     Args:
         grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
@@ -35,32 +36,32 @@ def is_open_2x2(grid: list[list[int]], tx: int, ty: int) -> bool:
         ty: Row of the top-left cell of the area.
 
     Returns:
-        True if the area fits in the maze and its four inner walls are all
-        open.
+        True if the area fits in the maze and all its inner walls are open.
 
     """
-    if tx < 0 or ty < 0 or tx + 1 >= len(grid[0]) or ty + 1 >= len(grid):
+    size = OPEN_AREA_SIZE
+    if tx < 0 or ty < 0 or tx + size > len(grid[0]) or ty + size > len(grid):
         return False
-    walls = (
-        grid[ty][tx] & E
-        | grid[ty + 1][tx] & E
-        | grid[ty][tx] & S
-        | grid[ty][tx + 1] & S
-    )
-    return walls == 0
+    for y in range(ty, ty + size):
+        for x in range(tx, tx + size):
+            if x < tx + size - 1 and grid[y][x] & E:
+                return False
+            if y < ty + size - 1 and grid[y][x] & S:
+                return False
+    return True
 
 
-def makes_open_2x2(
+def makes_open_area(
     grid: list[list[int]],
     x: int,
     y: int,
     direction: int,
 ) -> bool:
-    """Check whether an opened edge belongs to an open 2x2 area.
+    """Check whether an opened edge belongs to an open 3x3 area.
 
     The wall must already be removed from the grid. ``N`` and ``W`` edges are
     converted to the matching ``S`` and ``E`` edges of the neighboring cell,
-    then the two 2x2 areas sharing the edge are checked.
+    then the six 3x3 areas containing the edge are checked.
 
     Args:
         grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
@@ -69,15 +70,20 @@ def makes_open_2x2(
         direction: Side of the cell that was opened.
 
     Returns:
-        True if either 2x2 area sharing the edge is fully open.
+        True if any 3x3 area containing the edge is fully open.
 
     """
     if direction in (W, N):
         dx, dy, direction = MOVES[direction]
         x, y = x + dx, y + dy
+    size = OPEN_AREA_SIZE
     if direction == E:
-        return is_open_2x2(grid, x, y - 1) or is_open_2x2(grid, x, y)
-    return is_open_2x2(grid, x - 1, y) or is_open_2x2(grid, x, y)
+        xs = range(x - size + 2, x + 1)
+        ys = range(y - size + 1, y + 1)
+    else:
+        xs = range(x - size + 1, x + 1)
+        ys = range(y - size + 2, y + 1)
+    return any(is_open_area(grid, tx, ty) for ty in ys for tx in xs)
 
 
 def breakable_dirs(
@@ -89,7 +95,7 @@ def breakable_dirs(
     """List the walls of a cell that can safely be removed.
 
     A wall is breakable if it is closed, is not on the maze border, does not
-    lead to a blocked cell, and does not create an open 2x2 area when removed.
+    lead to a blocked cell, and does not create an open 3x3 area when removed.
     Each wall is removed temporarily to test it, then restored.
 
     Args:
@@ -114,7 +120,7 @@ def breakable_dirs(
         if (nx, ny) in blocked:
             continue
         remove_wall(grid, x, y, direction)
-        if not makes_open_2x2(grid, x, y, direction):
+        if not makes_open_area(grid, x, y, direction):
             dirs.append(direction)
         add_wall(grid, x, y, direction)
     return dirs

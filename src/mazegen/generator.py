@@ -2,6 +2,7 @@ from pydantic import ValidationError
 
 from .errors import MazeNotGeneratedError, ParamsValidationError
 from .generate.gen_maze import generate
+from .generate.pattern42 import MIN_HEIGHT, MIN_WIDTH
 from .models import MazeParams, PathResult
 from .solve.solver import solve
 
@@ -70,3 +71,18 @@ class MazeGenerator:
         if self._grid is None:
             raise MazeNotGeneratedError
         return solve(self._grid, self._params.entry, self._params.exit)
+
+    def has_42pattern(self) -> bool:
+        """Check whether the maze is large enough to embed the 42 pattern.
+
+        Returns:
+            ``True`` if the width and height meet the minimum size for
+            the 42 pattern, ``False`` otherwise.
+
+        """
+        if self._grid is None:
+            raise MazeNotGeneratedError
+        return (
+            self._params.width >= MIN_WIDTH
+            and self._params.height >= MIN_HEIGHT
+        )
