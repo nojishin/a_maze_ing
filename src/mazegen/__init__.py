@@ -1,10 +1,10 @@
-from .errors import MazegenError, ParamsValidationError
+from .errors import MazeGenError, ParamsValidationError
 from .generator import MazeGenerator
 from .models import PathResult
 
 __all__ = [
     "MazeGenerator",
-    "MazegenError",
+    "MazeGenError",
     "ParamsValidationError",
     "PathResult",
 ]
