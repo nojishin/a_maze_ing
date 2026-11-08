@@ -33,7 +33,7 @@ def _build_wall_grids(
     return h_wall, v_wall
 
 
-def _draw_walls(grid: list[list[int]]) -> list[list[str]]:
+def _draw_walls(grid: list[list[int]], wall: str) -> list[list[str]]:
     height = len(grid)
     width = len(grid[0])
     h_wall, v_wall = _build_wall_grids(grid)
@@ -47,17 +47,17 @@ def _draw_walls(grid: list[list[int]]) -> list[list[str]]:
             right = col < width and h_wall[row][col]
             mask = up | down | left | right
             if mask:
-                canvas[2 * row][2 * col] = WALL
+                canvas[2 * row][2 * col] = wall
 
     for row in range(height + 1):
         for col in range(width):
             if h_wall[row][col]:
-                canvas[2 * row][2 * col + 1] = WALL
+                canvas[2 * row][2 * col + 1] = wall
 
     for row in range(height):
         for col in range(width + 1):
             if v_wall[row][col]:
-                canvas[2 * row + 1][2 * col] = WALL
+                canvas[2 * row + 1][2 * col] = wall
     return canvas
 
 
@@ -110,6 +110,7 @@ def render_maze(
     grid: list[list[int]],
     entry: tuple[int, int],
     exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
+    wall: str = WALL,
     path: list[tuple[int, int]] | None = None,
 ) -> str:
     """Render the maze as a string with ANSI colors.
@@ -120,12 +121,13 @@ def render_maze(
         grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
         entry: The ``(x, y)`` entry cell.
         exit: The ``(x, y)`` exit cell.
+        wall: The colored block used to draw walls.
         path: Cells of the solution path to draw, or ``None`` to hide it.
 
     Returns:
         The rendered maze.
 
     """
-    canvas = _draw_walls(grid)
+    canvas = _draw_walls(grid, wall)
     _draw_markers(canvas, entry, exit, path)
     return _add_labels(canvas)
