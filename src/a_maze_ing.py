@@ -63,6 +63,7 @@ def write_file(
         ", ".join(map(str, entry)),
         ", ".join(map(str, exit)),
         directions,
+        "",
     ]
     text = "\n".join(texts)
     try:
