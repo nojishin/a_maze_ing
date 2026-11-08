@@ -10,7 +10,27 @@
 
 ## Instructions
 
-### インストール
+### makeコマンド
+```sh
+make install
+```
+パッケージのインストールを行います。
+
+```sh
+make run # uv run a_maze_ing.py config.txt
+make debug # uv run python -m pdb a_maze_ing.py config.txt
+```
+`config.txt`を読み込み`a_maze_ingg.py`を実行する
+
+```sh
+make lint
+```
+`mypy`と`flake8`を確認します。
+
+```sh
+make clean
+```
+`__pycache__` やキャッシュを削除する
 
 ### 操作コマンド
 
@@ -19,8 +39,6 @@
 | `generate` (`g`) | 新しい迷路を生成する |
 | `path` (`p`) | 解の経路を表示 / 非表示にする |
 | `exit` (`q`) | 終了する |
-
-### Lint
 
 ## Architecture
 ### 処理の流れ
@@ -174,27 +192,110 @@ def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 隣も行き止まりになる壁を優先して壊し、2×2の空間ができる壁と42パターンのセルに接する壁は壊さない。
 
 ## Reusable code
-迷路生成のロジックは `mazegen` パッケージにまとめていて、設定ファイルの読み込みや描画とは独立して使える。
-
+### クラス
 ```py
-from mazegen import MazeGenerator, MazeGenError
+class MazeGenerator:
+    """Generate a maze and find its solution path."""
 
-try:
-    generator = MazeGenerator(
-        width=20,
-        height=15,
-        entry=(1, 1),
-        exit=(18, 13),
-        is_perfect=True,
-        seed=42,
-    )
-    grid = generator.generate()
-except MazeGenError as e:
-    print(e)
+    def __init__(  # noqa: PLR0913 - public API, mirrors MazeParams fields
+        self,
+        *,
+        width: int,
+        height: int,
+        entry: tuple[int, int],
+        exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
+        is_perfect: bool,
+        seed: int | None = None,
+    ) -> None:
+        """Validate and store the maze parameters.
+
+        Args:
+            width: Maze width in cells.
+            height: Maze height in cells.
+            entry: The ``(x, y)`` entry cell.
+            exit: The ``(x, y)`` exit cell.
+            is_perfect: Whether exactly one path joins any two cells.
+            seed: Random seed. ``None`` gives a different maze each time.
+
+        Raises:
+            ParamsValidationError: If a parameter is invalid.
+
+        """
+        try:
+            self._params = MazeParams(
+                width=width,
+                height=height,
+                entry=entry,
+                exit=exit,
+                is_perfect=is_perfect,
+                seed=seed,
+            )
+        except ValidationError as e:
+            raise ParamsValidationError(e) from e
+        self._grid: list[list[int]] | None = None
+
+    def generate(self) -> list[list[int]]:
+        """Generate a new maze.
+
+        Returns:
+            A grid of wall bitmasks, indexed as ``grid[y][x]``.
+
+        """
+        self._grid = generate(self._params)
+        return self._grid
+
+    def solve(self) -> PathResult:
+        """Find the shortest path from the entry to the exit.
+
+        Returns:
+            The path cells and directions.
+
+        Raises:
+            MazeNotGeneratedError: If ``generate()`` has not been called.
+            PathNotFoundError: If the exit cannot be reached.
+
+        """
+        if self._grid is None:
+            raise MazeNotGeneratedError
+        return solve(self._grid, self._params.entry, self._params.exit)
+
+    def has_42pattern(self) -> bool:
+        """Check whether the maze is large enough to embed the 42 pattern.
+
+        Returns:
+            ``True`` if the width and height meet the minimum size for
+            the 42 pattern, ``False`` otherwise.
+
+        """
+        if self._grid is None:
+            raise MazeNotGeneratedError
+        return (
+            self._params.width >= MIN_WIDTH
+            and self._params.height >= MIN_HEIGHT
+        )
 ```
+### 引数
 
-- パラメータに誤りがある場合は `ParamsValidationError`（`MazegenError` のサブクラス）が送出される。
-- `seed` を指定すると、同じパラメータから毎回同じ迷路が生成される。
+| 引数 | 型 | 内容 |
+|---|---|---|
+| `width` | `int` | 迷路の幅（セル数） |
+| `height` | `int` | 迷路の高さ（セル数） |
+| `entry` | `tuple[int, int]` | 入口のセル `(x, y)` |
+| `exit` | `tuple[int, int]` | 出口のセル `(x, y)` |
+| `is_perfect` | `bool` | `True` なら任意の2セル間の経路が1本だけの完全迷路にする |
+| `seed` | `int \| None` | 乱数のシード。同じ値なら同じ迷路になる |
+
+不正な値を渡すと `ParamsValidationError`が送られる
+
+### メソッド
+| メソッド | 戻り値 | 内容 |
+|---|---|---|
+| `generate()` | `list[list[int]]` | 新しい迷路を生成して返す。形式は [迷路のデータ形式](#迷路のデータ形式) を参照 |
+| `solve()` | `PathResult` | 入口から出口までの最短経路を返す。`coord` は通るセルの座標のリスト、`directions` は `N` `E` `S` `W` で表した移動の文字列 |
+| `has_42pattern()` | `bool` | 迷路が42パターンを埋め込める大きさかどうかを返す |
+
+`generate()` より前に `solve()` か `has_42pattern()` を呼ぶと `MazeNotGeneratedError` が送出され、出口に到達できない場合は `PathNotFoundError` が送出される。
+例外はすべて `MazeGenError` を継承しているので、まとめて捕捉することもできる。
 
 ### 迷路のデータ形式
 迷路は `grid[y][x]` でアクセスする2次元リストで、各セルの壁を4ビットで表す。
