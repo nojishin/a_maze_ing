@@ -126,7 +126,11 @@ def breakable_dirs(
     return dirs
 
 
-def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+def add_loops(
+    grid: list[list[int]],
+    blocked: set[tuple[int, int]],
+    rnd: random.Random,
+) -> None:
     """Create loops by opening a wall of each dead end, in place.
 
     Dead ends are visited in random order. A wall shared with another dead end
@@ -136,6 +140,7 @@ def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
     Args:
         grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
         blocked: Cells reserved for the 42 pattern.
+        rnd: Random number generator for the order and wall choice.
 
     """
     dead_ends = [
@@ -144,7 +149,7 @@ def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
         for x in range(len(grid[0]))
         if is_dead_end(grid, x, y, blocked)
     ]
-    random.shuffle(dead_ends)
+    rnd.shuffle(dead_ends)
     for x, y in dead_ends:
         if not is_dead_end(grid, x, y, blocked):
             continue
@@ -155,4 +160,4 @@ def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
             d for d in dirs
             if is_dead_end(grid, x + MOVES[d][0], y + MOVES[d][1], blocked)
         ]
-        remove_wall(grid, x, y, random.choice(best or dirs))
+        remove_wall(grid, x, y, rnd.choice(best or dirs))
