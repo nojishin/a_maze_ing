@@ -1,10 +1,19 @@
-from .errors import MazeGenError, ParamsValidationError
+from .errors import (
+    MazeGenError,
+    MazeNotGeneratedError,
+    ParamsValidationError,
+    PathNotFoundError,
+    PatternOverlapError,
+)
 from .generator import MazeGenerator
 from .models import PathResult
 
 __all__ = [
-    "MazeGenerator",
     "MazeGenError",
+    "MazeGenerator",
+    "MazeNotGeneratedError",
     "ParamsValidationError",
+    "PathNotFoundError",
     "PathResult",
+    "PatternOverlapError",
 ]
