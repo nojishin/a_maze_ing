@@ -330,7 +330,7 @@ Support multiple maze generation algorithms.
 改善できる点
 毎回、到達済みのセルすべてから候補を探し直しているので大きすぎる迷路を生成する場合に遅くなってしまう。
 ### 使用したツール
-claude ai
+claude ai、uv、mypy、flake8
 ## Resources
 ### 参考資料
 - [Maze algorithms](https://www.jamisbuck.org/mazes/)
