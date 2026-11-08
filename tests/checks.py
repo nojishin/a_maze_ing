@@ -11,6 +11,7 @@ N, E, S, W = 1, 2, 4, 8
 ALL_WALLS = N | E | S | W
 MOVES = {N: (0, -1, S), E: (1, 0, W), S: (0, 1, N), W: (-1, 0, E)}
 LETTER = {"N": N, "E": E, "S": S, "W": W}
+MIN_SIZE = 3
 MAX_SIZE = 100
 OPEN_AREA = 3
 
@@ -34,11 +35,8 @@ def random_params(*, perfect: bool | None = None) -> Params:
     """Pick random valid params (entry/exit outside the 42 pattern)."""
     if perfect is None:
         perfect = random.choice([True, False])
-    while True:
-        width = random.randint(1, MAX_SIZE)
-        height = random.randint(1, MAX_SIZE)
-        if width * height >= 2:  # noqa: PLR2004 - entry != exit
-            break
+    width = random.randint(MIN_SIZE, MAX_SIZE)
+    height = random.randint(MIN_SIZE, MAX_SIZE)
     blocked = make_blocked(width, height)
     free = [
         (x, y)
