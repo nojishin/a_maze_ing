@@ -63,18 +63,20 @@ def _draw_walls(grid: list[list[int]]) -> list[list[str]]:
 
 def _draw_markers(
     canvas: list[list[str]],
-    entry: tuple[int, int],
-    exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
+    entry: tuple[int, int] | None,
+    exit: tuple[int, int] | None,  # noqa: A002 - pairs with `entry`
     path: list[tuple[int, int]] | None,
 ) -> None:
     if path is not None:
         for x, y in path:
             canvas[1 + y * 2][1 + x * 2] = PATH
 
-    enx, eny = entry
-    canvas[1 + eny * 2][1 + enx * 2] = ENTRY
-    eix, eiy = exit
-    canvas[1 + eiy * 2][1 + eix * 2] = EXIT
+    if entry is not None:
+        enx, eny = entry
+        canvas[1 + eny * 2][1 + enx * 2] = ENTRY
+    if exit is not None:
+        eix, eiy = exit
+        canvas[1 + eiy * 2][1 + eix * 2] = EXIT
 
 
 def _add_labels(canvas: list[list[str]]) -> str:
@@ -108,8 +110,8 @@ def _add_labels(canvas: list[list[str]]) -> str:
 
 def render_maze(
     grid: list[list[int]],
-    entry: tuple[int, int],
-    exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
+    entry: tuple[int, int] | None = None,
+    exit: tuple[int, int] | None = None,  # noqa: A002 - pairs with `entry`
     path: list[tuple[int, int]] | None = None,
 ) -> str:
     """Render the maze as a string with ANSI colors.
@@ -118,8 +120,8 @@ def render_maze(
 
     Args:
         grid: Maze grid of wall bitmasks, indexed as ``grid[y][x]``.
-        entry: The ``(x, y)`` entry cell.
-        exit: The ``(x, y)`` exit cell.
+        entry: The ``(x, y)`` entry cell, or ``None`` to not draw it.
+        exit: The ``(x, y)`` exit cell, or ``None`` to not draw it.
         path: Cells of the solution path to draw, or ``None`` to hide it.
 
     Returns:

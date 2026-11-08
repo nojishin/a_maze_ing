@@ -3,6 +3,7 @@ from collections import deque
 
 from mazegen.errors import PatternOverlapError
 from mazegen.models import MazeParams
+from visualizer.diff_renderer import debug_printer
 
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
 from .non_perfect import add_loops
@@ -229,8 +230,10 @@ def divide(  # noqa: PLR0913, PLR0917
     is_horizontal = choose_orientation(width, height, rnd)
     if is_horizontal:
         divide_horizontal(grid, x, y, width, height, rnd)
+        debug_printer.show(grid, "divide_horizonal")
     else:
         divide_vertical(grid, x, y, width, height, rnd)
+        debug_printer.show(grid, "divide_vertical")
 
 
 def generate(maze_params: MazeParams) -> list[list[int]]:
@@ -258,9 +261,15 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     if maze_params.entry in blocked or maze_params.exit in blocked:
         raise PatternOverlapError
     rnd = random.Random(maze_params.seed)
+    debug_printer.reset(maze_params.entry, maze_params.exit)
+    debug_printer.show(grid, "init")
     divide(grid, 0, 0, width, height, rnd)
+    debug_printer.show(grid, "divide")
     close_blocked(grid, blocked)
+    debug_printer.show(grid, "close_blocked")
     repair(grid, blocked, rnd)
+    debug_printer.show(grid, "repair")
     if not maze_params.is_perfect:
         add_loops(grid, blocked, rnd)
+        debug_printer.show(grid, "add_loops")
     return grid

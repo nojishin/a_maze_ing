@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "a_maze_ing (config.txt)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/a_maze_ing.py",
+            "args": ["config.txt"],
+            "cwd": "${workspaceFolder}/src",
+            "python": "${workspaceFolder}/src/.venv/bin/python",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Current file",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}/src",
+            "python": "${workspaceFolder}/src/.venv/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
+            },
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "pytest (all tests)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": ["tests", "-x"],
+            "cwd": "${workspaceFolder}",
+            "python": "${workspaceFolder}/src/.venv/bin/python",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}"
+            },
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}

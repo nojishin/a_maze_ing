@@ -1,5 +1,7 @@
 import random
 
+from visualizer.diff_renderer import debug_printer
+
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
 
 DEAD_END_WALLS = 3
@@ -120,9 +122,11 @@ def breakable_dirs(
         if (nx, ny) in blocked:
             continue
         remove_wall(grid, x, y, direction)
+        # debug_printer.show(grid, f"try remove ({x}, {y})")
         if not makes_open_area(grid, x, y, direction):
             dirs.append(direction)
         add_wall(grid, x, y, direction)
+        # debug_printer.show(grid, f"restore ({x}, {y})")
     return dirs
 
 
@@ -157,7 +161,9 @@ def add_loops(
         if not dirs:
             continue
         best = [
-            d for d in dirs
+            d
+            for d in dirs
             if is_dead_end(grid, x + MOVES[d][0], y + MOVES[d][1], blocked)
         ]
         remove_wall(grid, x, y, rnd.choice(best or dirs))
+        # debug_printer.show(grid, f"add_loops ({x}, {y})")
