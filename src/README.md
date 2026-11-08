@@ -171,7 +171,7 @@ def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 ```
 行き止まりのセルをランダムな順に調べ、壁を1枚壊してループを作る。
-隣も行き止まりになる壁を優先して壊し、2×2の空間ができる壁と42パターンのセルに接する壁は壊さない。
+隣も行き止まりになる壁を優先して壊し、3×3の空間ができる壁と42パターンのセルに接する壁は壊さない。
 
 ## Reusable code
 迷路生成のロジックは `mazegen` パッケージにまとめていて、設定ファイルの読み込みや描画とは独立して使える。
