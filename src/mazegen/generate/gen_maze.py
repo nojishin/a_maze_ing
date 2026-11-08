@@ -1,7 +1,7 @@
 import random
 from collections import deque
 
-from mazegen.errors import MazeGenError
+from mazegen.errors import PatternOverlapError
 from mazegen.models import MazeParams
 
 from .maze_utils import MOVES, E, N, S, W, add_wall, remove_wall
@@ -244,8 +244,7 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     grid = parse_grid(width, height)
     blocked = make_blocked(width, height)
     if maze_params.entry in blocked or maze_params.exit in blocked:
-        msg = "ENTRY or EXIT overlaps the 42 pattern."
-        raise MazeGenError(msg)
+        raise PatternOverlapError
     random.seed(maze_params.seed)
     divide(grid, 0, 0, width, height)
     close_blocked(grid, blocked)

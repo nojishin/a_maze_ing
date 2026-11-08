@@ -52,3 +52,11 @@ class MazeNotGeneratedError(MazeGenError):
     def __init__(self) -> None:
         """Build the error message."""
         super().__init__("Maze not generated. Call generate() first.")
+
+
+class PatternOverlapError(MazeGenError):
+    """Raised when the entry or exit overlaps the 42 pattern."""
+
+    def __init__(self) -> None:
+        """Build the error message."""
+        super().__init__("ENTRY or EXIT overlaps the 42 pattern.")
