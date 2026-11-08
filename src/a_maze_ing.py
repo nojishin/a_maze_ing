@@ -7,13 +7,21 @@ from input.maze_config import parse_config
 from mazegen import MazeGenerator, MazeGenError
 from visualizer.renderder import render_maze
 
+WALL_COLORS = [
+    "\033[47m  \033[0m",
+    "\033[44m  \033[0m",
+    "\033[43m  \033[0m",
+    "\033[45m  \033[0m",
+]
 
-def print_maze(
+
+def print_maze(  # noqa: PLR0913 - keyword-only, one arg per maze part
     *,
     grid: list[list[int]],
     entry: tuple[int, int],
     exit: tuple[int, int],  # noqa: A002 - pairs with `entry`
     path: list[tuple[int, int]],
+    wall: str,
     show_path: bool,
 ) -> None:
     """Print the maze to the terminal.
@@ -23,13 +31,14 @@ def print_maze(
         entry: The ``(x, y)`` entry cell.
         exit: The ``(x, y)`` exit cell.
         path: Cells of the solution path, from entry to exit.
+        wall: The colored block used to draw walls.
         show_path: Whether to draw the solution path.
 
     """
     if show_path:
-        print(render_maze(grid, entry, exit, path))
+        print(render_maze(grid, entry, exit, wall, path))
     else:
-        print(render_maze(grid, entry, exit))
+        print(render_maze(grid, entry, exit, wall))
 
 
 def write_file(
@@ -72,7 +81,7 @@ def write_file(
         raise OutputFileWriteError(output_file, str(e)) from e
 
 
-def main() -> None:
+def main() -> None:  # noqa: C901 - flat command dispatch in one match
     """Read the config, then run the interactive command loop.
 
     Errors are printed and the program exits with status 1.
@@ -100,9 +109,11 @@ def main() -> None:
         "Commands:\n"
         "generate (g) : generate a new maze\n"
         "path     (p) : show / hide the solution path\n"
+        "color    (c) : change wall color\n"
         "exit     (q) : quit\n",
     )
     show_path = True
+    color_idx = 0
     try:
         while True:
             try:
@@ -119,6 +130,7 @@ def main() -> None:
                         entry=config.entry,
                         exit=config.exit,
                         path=path.coord,
+                        wall=WALL_COLORS[color_idx],
                         show_path=show_path,
                     )
                     write_file(
@@ -135,6 +147,16 @@ def main() -> None:
                     else:
                         show_path = True
                         print("Solution path: shown")
+                case "color" | "c":
+                    color_idx = (color_idx + 1) % len(WALL_COLORS)
+                    print_maze(
+                        grid=grid,
+                        entry=config.entry,
+                        exit=config.exit,
+                        path=path.coord,
+                        wall=WALL_COLORS[color_idx],
+                        show_path=show_path,
+                    )
                 case "exit" | "q":
                     break
                 case _:
