@@ -17,8 +17,8 @@
 | コマンド | 内容 |
 |---|---|
 | `generate` (`g`) | 新しい迷路を生成する |
-| `route` (`r`) | 解の経路を表示 / 非表示にする |
-| `exit` (`e`) | 終了する |
+| `path` (`p`) | 解の経路を表示 / 非表示にする |
+| `exit` (`q`) | 終了する |
 
 ### Lint
 
@@ -38,8 +38,44 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 設定ファイルやパラメータに誤りがある場合は、その時点でエラーを表示して終了する（errors/）。
 迷路生成の詳しい手順は [Maze generation algorithm](#maze-generation-algorithm) にまとめている。
 ### フォルダー構成
-### 主なクラス
-
+```
+.
+├── a_maze_ing.py
+├── errors
+│   ├── __init__.py
+│   ├── exceptions.py
+│   └── handler.py
+├── input
+│   ├── __init__.py
+│   ├── cli.py
+│   └── maze_config.py
+├── LICENCE.md
+├── Makefile
+├── maze_analyzer.py
+├── mazegen
+│   ├── __init__.py
+│   ├── errors.py
+│   ├── generate
+│   │   ├── __init__.py
+│   │   ├── gen_maze.py
+│   │   ├── maze_utils.py
+│   │   ├── non_perfect.py
+│   │   └── pattern42.py
+│   ├── generator.py
+│   ├── models.py
+│   └── solve
+│       ├── __init__.py
+│       └── solver.py
+├── models
+│   ├── __init__.py
+│   └── config.py
+├── pyproject.toml
+├── README.md
+├── uv.lock
+└── visualizer
+    ├── __init__.py
+    └── renderder.py
+```
 ## Configuration
 1行に1つ、`KEY=VALUE` の形式で書く。
 SEEDのみ任意。
@@ -199,6 +235,7 @@ claude ai
 - [ビット演算](https://qiita.com/7shi/items/41d262ca11ea16d85abc)
 - [ビット演算子](https://note.nkmk.me/python-bit-operation/)
 ### AIの利用
-shshimiz
+#### shshimiz
 docstringの作成、READMEの作成補助、迷路生成コードのエラー解決、42パターンを迷路に埋め込む処理の検討
-snoji
+#### snoji
+docstringの作成、より良い設計・読みやすいコードの検討
