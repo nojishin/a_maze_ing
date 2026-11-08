@@ -9,7 +9,7 @@ from pydantic import (
     model_validator,
 )
 
-MazeSize = Annotated[int, Field(ge=1, le=100)]
+MazeSize = Annotated[int, Field(ge=3, le=100)]
 MazeCoord = Annotated[int, Field(ge=0, le=99)]
 
 
