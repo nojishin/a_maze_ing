@@ -41,12 +41,10 @@ def build(**overrides: Any) -> MazeGenerator:  # noqa: ANN401 - kwargs
 @pytest.mark.parametrize(
     ("width", "height", "entry", "exit_"),
     [
-        (2, 1, (0, 0), (1, 0)),  # smallest horizontal
-        (1, 2, (0, 0), (0, 1)),  # smallest vertical
-        (1, 100, (0, 0), (0, 99)),  # 1-cell-wide corridor
-        (100, 1, (99, 0), (0, 0)),  # 1-cell-high corridor
-        (2, 2, (0, 0), (1, 1)),
-        (3, 3, (0, 0), (2, 2)),  # smallest size that could be fully open
+        (3, 3, (0, 0), (2, 2)),  # smallest, could be fully open
+        (3, 100, (0, 0), (2, 99)),  # narrowest and tallest
+        (100, 3, (99, 0), (0, 2)),  # widest and lowest
+        (3, 3, (1, 1), (0, 0)),  # entry in the center
         (MIN_WIDTH - 1, MIN_HEIGHT, (0, 0), (7, 6)),  # just too small for 42
         (MIN_WIDTH, MIN_HEIGHT - 1, (0, 0), (8, 5)),  # just too small for 42
         (MIN_WIDTH, MIN_HEIGHT, (0, 0), (8, 6)),  # smallest with 42
@@ -135,16 +133,18 @@ def test_imperfect_has_loops() -> None:
     "overrides",
     [
         {"width": 0},
+        {"width": 2},  # just below the minimum
         {"width": 101},
         {"height": 0},
+        {"height": 2},  # just below the minimum
         {"height": 101},
+        {"width": 2, "height": 2, "exit": (1, 1)},
         {"width": -1},
         {"entry": (-1, 0)},
         {"exit": (0, -1)},
         {"entry": (20, 0)},  # x == width
         {"exit": (0, 15)},  # y == height
         {"entry": (19, 14)},  # same as exit
-        {"width": 1, "height": 1, "exit": (0, 0)},  # 1x1 forces entry == exit
         {"width": "abc"},
         {"entry": (1, 2, 3)},
     ],
