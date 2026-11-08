@@ -1,0 +1,7 @@
+extend = "../src/pyproject.toml"
+src = ["../src", ".."]
+
+[lint.per-file-ignores]
+"*" = [
+    "S101", # pytest uses assert
+]
