@@ -44,8 +44,8 @@ def render_diff(
         msg = "grids must have the same size"
         raise ValueError(msg)
 
-    old_canvas = _draw_walls(before)
-    canvas = _draw_walls(after)
+    old_canvas = _draw_walls(before, WALL)
+    canvas = _draw_walls(after, WALL)
     added = removed = 0
 
     # Compare the drawn mazes cell by cell, so corners are caught too.
