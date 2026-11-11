@@ -92,7 +92,7 @@ def write_file(
         raise OutputFileWriteError(output_file, str(e)) from e
 
 
-def main() -> None:  # noqa: C901 - flat command dispatch in one match
+def main() -> None:  # noqa: C901, PLR0912, PLR0915 - command dispatch
     """Read the config, then run the interactive command loop.
 
     Errors are printed and the program exits with status 1.

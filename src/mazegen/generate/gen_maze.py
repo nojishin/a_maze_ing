@@ -141,7 +141,7 @@ def repair(
         flood(grid, (x + dx, y + dy), visited)
 
 
-def divide_horizontal(  # noqa: PLR0913, PLR0917
+def divide_horizontal(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
@@ -172,7 +172,7 @@ def divide_horizontal(  # noqa: PLR0913, PLR0917
     divide(grid, x, wall_y + 1, width, y + height - wall_y - 1, rnd)
 
 
-def divide_vertical(  # noqa: PLR0913, PLR0917
+def divide_vertical(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
@@ -203,7 +203,7 @@ def divide_vertical(  # noqa: PLR0913, PLR0917
     divide(grid, wall_x + 1, y, x + width - wall_x - 1, height, rnd)
 
 
-def divide(  # noqa: PLR0913, PLR0917
+def divide(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
