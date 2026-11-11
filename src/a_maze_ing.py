@@ -14,6 +14,16 @@ WALL_COLORS = [
     "\033[45m  \033[0m",
 ]
 
+HELP_MSG = (
+    "=== A-Maze-ing ===\n"
+    "Commands:\n"
+    "generate (g) : generate a new maze\n"
+    "path     (p) : show / hide the solution path\n"
+    "color    (c) : change wall color\n"
+    "help     (h) : show this message\n"
+    "exit     (q) : quit\n"
+)
+
 
 def print_maze(  # noqa: PLR0913 - keyword-only, one arg per maze part
     *,
@@ -105,14 +115,7 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
     except MazeGenError as e:
         error_handler(e)
 
-    print(
-        "=== A-Maze-ing ===\n"
-        "Commands:\n"
-        "generate (g) : generate a new maze\n"
-        "path     (p) : show / hide the solution path\n"
-        "color    (c) : change wall color\n"
-        "exit     (q) : quit\n",
-    )
+    print(HELP_MSG)
     show_path = True
     color_idx = 0
     try:
@@ -171,6 +174,8 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                         wall=WALL_COLORS[color_idx],
                         show_path=show_path,
                     )
+                case "help" | "h":
+                    print(HELP_MSG)
                 case "exit" | "q":
                     break
                 case _:
