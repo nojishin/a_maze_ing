@@ -1,0 +1,7 @@
+.venv
+docs/
+.mypy_cache
+CLAUDE.md
+__pycache__
+src/*.txt
+**/.DS_Store
