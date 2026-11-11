@@ -61,6 +61,7 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 ```
 .
 ├── a_maze_ing.py
+├── config.txt
 ├── errors
 │   ├── __init__.py
 │   ├── exceptions.py
@@ -69,9 +70,8 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 │   ├── __init__.py
 │   ├── cli.py
 │   └── maze_config.py
-├── LICENCE.md
+├── LICENSE.md
 ├── Makefile
-├── maze_analyzer.py
 ├── mazegen
 │   ├── __init__.py
 │   ├── errors.py
@@ -86,6 +86,8 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 │   └── solve
 │       ├── __init__.py
 │       └── solver.py
+├── mazegen-1.0.0-py3-none-any.whl
+├── mazegen-1.0.0.tar.gz
 ├── models
 │   ├── __init__.py
 │   └── config.py
