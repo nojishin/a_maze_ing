@@ -126,6 +126,11 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                 case "generate" | "g":
                     grid = maze_generator.generate()
                     path = maze_generator.solve()
+                    if not maze_generator.has_42pattern():
+                        print(
+                            "Warning: the 42 pattern could not be embedded ",
+                            "(maze too small).",
+                        )
                     print_maze(
                         grid=grid,
                         entry=config.entry,
