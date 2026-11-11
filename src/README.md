@@ -38,6 +38,8 @@ make clean
 |---|---|
 | `generate` (`g`) | 新しい迷路を生成する |
 | `path` (`p`) | 解の経路を表示 / 非表示にする |
+| `color`(`c`) | 壁の色を変える |
+| `help`(`h`)  | 操作コマンドを表示する|
 | `exit` (`q`) | 終了する |
 
 ## Architecture
@@ -330,7 +332,7 @@ Support multiple maze generation algorithms.
 改善できる点
 毎回、到達済みのセルすべてから候補を探し直しているので大きすぎる迷路を生成する場合に遅くなってしまう。
 ### 使用したツール
-claude ai、uv、mypy、flake8
+claude ai、uv(仮想環境)、mypy(型ヒントのチェック)、flake8(フォーマッター)、ruff(開発用フォーマッター)
 ## Resources
 ### 参考資料
 - [Maze algorithms](https://www.jamisbuck.org/mazes/)
