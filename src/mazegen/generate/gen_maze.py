@@ -33,7 +33,7 @@ def choose_orientation(width: int, height: int, rnd: random.Random) -> bool:
     return rnd.choice([True, False])
 
 
-def parse_grid(width: int, height: int) -> list[list[int]]:
+def init_grid(width: int, height: int) -> list[list[int]]:
     """Create a grid whose only walls are the outer border.
 
     Args:
@@ -253,7 +253,7 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     """
     width = maze_params.width
     height = maze_params.height
-    grid = parse_grid(width, height)
+    grid = init_grid(width, height)
     blocked = make_blocked(width, height)
     if maze_params.entry in blocked or maze_params.exit in blocked:
         raise PatternOverlapError

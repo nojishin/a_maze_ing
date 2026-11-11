@@ -134,7 +134,7 @@ PERFECT=False のときだけループを追加する
 ```
 #### 1. 外周の壁だけを作る
 ```py
-def parse_grid(width: int, height: int) -> list[list[int]]:
+def init_grid(width: int, height: int) -> list[list[int]]:
 ```
 迷路全体を、外周にだけ壁がある1つの広い部屋とする。
 
