@@ -118,6 +118,7 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
     print(HELP_MSG)
     show_path = True
     color_idx = 0
+    grid: list[list[int]] | None = None
     try:
         while True:
             try:
@@ -150,6 +151,9 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                         directions=path.directions,
                     )
                 case "path" | "p":
+                    if grid is None:
+                        print("No maze yet. Run 'generate' first.")
+                        continue
                     if show_path:
                         show_path = False
                         print("Solution path: hidden")
@@ -165,6 +169,9 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                         show_path=show_path,
                     )
                 case "color" | "c":
+                    if grid is None:
+                        print("No maze yet. Run 'generate' first.")
+                        continue
                     color_idx = (color_idx + 1) % len(WALL_COLORS)
                     print_maze(
                         grid=grid,
