@@ -153,6 +153,14 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                     else:
                         show_path = True
                         print("Solution path: shown")
+                    print_maze(
+                        grid=grid,
+                        entry=config.entry,
+                        exit=config.exit,
+                        path=path.coord,
+                        wall=WALL_COLORS[color_idx],
+                        show_path=show_path,
+                    )
                 case "color" | "c":
                     color_idx = (color_idx + 1) % len(WALL_COLORS)
                     print_maze(
