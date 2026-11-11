@@ -132,8 +132,9 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                     path = maze_generator.solve()
                     if not maze_generator.has_42pattern():
                         print(
-                            "Warning: the 42 pattern could not be embedded ",
+                            "Warning: the 42 pattern could not be embedded "
                             "(maze too small).",
+                            file=sys.stderr,
                         )
                     print_maze(
                         grid=grid,
@@ -152,7 +153,10 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                     )
                 case "path" | "p":
                     if grid is None:
-                        print("No maze yet. Run 'generate' first.")
+                        print(
+                            "No maze yet. Run 'generate' first.",
+                            file=sys.stderr,
+                        )
                         continue
                     if show_path:
                         show_path = False
@@ -170,9 +174,13 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                     )
                 case "color" | "c":
                     if grid is None:
-                        print("No maze yet. Run 'generate' first.")
+                        print(
+                            "No maze yet. Run 'generate' first.",
+                            file=sys.stderr,
+                        )
                         continue
                     color_idx = (color_idx + 1) % len(WALL_COLORS)
+                    print("Wall color changed")
                     print_maze(
                         grid=grid,
                         entry=config.entry,
@@ -186,7 +194,7 @@ def main() -> None:  # noqa: C901 - flat command dispatch in one match
                 case "exit" | "q":
                     break
                 case _:
-                    print(f"Unknown command: '{cmd}'")
+                    print(f"Unknown command: '{cmd}'", file=sys.stderr)
     except (MazeError, MazeGenError) as e:
         error_handler(e)
 
@@ -198,5 +206,4 @@ if __name__ == "__main__":
         print()
         sys.exit(130)
     except Exception as e:  # noqa: BLE001 - for subject
-        print(str(e))
-        sys.exit(1)
+        sys.exit(str(e))
