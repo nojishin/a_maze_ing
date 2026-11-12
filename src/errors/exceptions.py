@@ -95,7 +95,6 @@ class ConfigDuplicateKeyError(MazeError):
 
 
 def _format_error(error: ErrorDetails) -> str:
-
     message = ""
     key = error["loc"]
     reason = error["msg"]

@@ -8,5 +8,4 @@ def error_handler(error: Exception) -> None:
         error: The exception to report.
 
     """
-    print(str(error))
-    sys.exit(1)
+    sys.exit(str(error))

@@ -1,0 +1,60 @@
+[project]
+name = "a-maze-ing"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "nojishin", email = "154789190+nojishin@users.noreply.github.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic>=2.13.5",
+]
+
+[dependency-groups]
+dev = [
+    "flake8>=7.4.1",
+    "mypy>=2.3.1",
+    "pytest>=9.2.0",
+    "ruff>=0.16.7",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "mazegen"
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D203", # conflicts with D211
+    "D213", # conflicts with D212
+    "CPY001", # no copyright notice needed for a school project
+    "T201", # intentional CLI output, not debug leftovers
+    "S311", # random is for maze generation, not cryptography
+    "D100", # module docstrings are not required by the subject
+    "D104", # package docstrings are not required by the subject
+]
+unfixable = [
+    "F401", # unused import
+    "F841", # unused variable
+]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["../tests"]

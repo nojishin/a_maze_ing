@@ -33,7 +33,7 @@ def choose_orientation(width: int, height: int, rnd: random.Random) -> bool:
     return rnd.choice([True, False])
 
 
-def parse_grid(width: int, height: int) -> list[list[int]]:
+def init_grid(width: int, height: int) -> list[list[int]]:
     """Create a grid whose only walls are the outer border.
 
     Args:
@@ -141,7 +141,7 @@ def repair(
         flood(grid, (x + dx, y + dy), visited)
 
 
-def divide_horizontal(  # noqa: PLR0913, PLR0917
+def divide_horizontal(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
@@ -172,7 +172,7 @@ def divide_horizontal(  # noqa: PLR0913, PLR0917
     divide(grid, x, wall_y + 1, width, y + height - wall_y - 1, rnd)
 
 
-def divide_vertical(  # noqa: PLR0913, PLR0917
+def divide_vertical(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
@@ -203,7 +203,7 @@ def divide_vertical(  # noqa: PLR0913, PLR0917
     divide(grid, wall_x + 1, y, x + width - wall_x - 1, height, rnd)
 
 
-def divide(  # noqa: PLR0913, PLR0917
+def divide(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
@@ -253,7 +253,7 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     """
     width = maze_params.width
     height = maze_params.height
-    grid = parse_grid(width, height)
+    grid = init_grid(width, height)
     blocked = make_blocked(width, height)
     if maze_params.entry in blocked or maze_params.exit in blocked:
         raise PatternOverlapError

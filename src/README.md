@@ -38,6 +38,8 @@ make clean
 |---|---|
 | `generate` (`g`) | 新しい迷路を生成する |
 | `path` (`p`) | 解の経路を表示 / 非表示にする |
+| `color`(`c`) | 壁の色を変える |
+| `help`(`h`)  | 操作コマンドを表示する|
 | `exit` (`q`) | 終了する |
 
 ## Architecture
@@ -59,6 +61,7 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 ```
 .
 ├── a_maze_ing.py
+├── config.txt
 ├── errors
 │   ├── __init__.py
 │   ├── exceptions.py
@@ -67,9 +70,8 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 │   ├── __init__.py
 │   ├── cli.py
 │   └── maze_config.py
-├── LICENCE.md
+├── LICENSE.md
 ├── Makefile
-├── maze_analyzer.py
 ├── mazegen
 │   ├── __init__.py
 │   ├── errors.py
@@ -84,6 +86,8 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 │   └── solve
 │       ├── __init__.py
 │       └── solver.py
+├── mazegen-1.0.0-py3-none-any.whl
+├── mazegen-1.0.0.tar.gz
 ├── models
 │   ├── __init__.py
 │   └── config.py
@@ -134,7 +138,7 @@ PERFECT=False のときだけループを追加する
 ```
 #### 1. 外周の壁だけを作る
 ```py
-def parse_grid(width: int, height: int) -> list[list[int]]:
+def init_grid(width: int, height: int) -> list[list[int]]:
 ```
 迷路全体を、外周にだけ壁がある1つの広い部屋とする。
 
@@ -330,12 +334,29 @@ Support multiple maze generation algorithms.
 改善できる点
 毎回、到達済みのセルすべてから候補を探し直しているので大きすぎる迷路を生成する場合に遅くなってしまう。
 ### 使用したツール
-claude ai、uv、mypy、flake8
+claude ai、uv(仮想環境)、mypy(型ヒントのチェック)、flake8(フォーマッター)、ruff(開発用フォーマッター)
 ## Resources
 ### 参考資料
-- [Maze algorithms](https://www.jamisbuck.org/mazes/)
-- [ビット演算](https://qiita.com/7shi/items/41d262ca11ea16d85abc)
-- [ビット演算子](https://note.nkmk.me/python-bit-operation/)
+- [Maze Algorithms](https://www.jamisbuck.org/mazes/)
+- [Python ビット演算 超入門 #Python - Qiita](https://qiita.com/7shi/items/41d262ca11ea16d85abc)
+- [Pythonのビット演算子（論理積、論理和、排他的論理和、反転、シフト） \| note.nkmk.me](https://note.nkmk.me/python-bit-operation/)
+- [\[Python\]コマンドライン引数を受け取る方法 #argparse - Qiita](https://qiita.com/to-fmak/items/4b136479099826959ea6)
+- [【ざっくりと解説】Pythonのsysモジュールの使い方（メモ） #Python3 - Qiita](https://qiita.com/sue-hc/items/2d93496af4b3857e80ab)
+- [Python, pathlibの使い方（パスをオブジェクトとして操作・処理） \| note.nkmk.me](https://note.nkmk.me/python-pathlib-usage/)
+- [Pythonの基本的なエラー一覧とその原因の確認方法 \| note.nkmk.me](https://note.nkmk.me/python-error-message/)
+- [例外となかよく #Python - Qiita](https://qiita.com/yulily/items/0844e1a928a95df32a26)
+- [【Python入門】Pythonにおけるclassの使い方とは? #Python3 - Qiita](https://qiita.com/Morio/items/0fe3abb58fcaff229f3d)
+- [pythonで継承とsuper()を使って派生クラスをinitしてみよう #Python - Qiita](https://qiita.com/Anaakikutsushit/items/c67d4edb0c01a97f3130)
+- [組み込み関数 — Python 3.14.7 ドキュメント](https://docs.python.org/ja/3/builtins/functions.html#super)
+- [【完全解説！】Pythonの例外処理を基礎から実務レベルまで完全にマスターする](https://zenn.dev/tigrebiz/articles/python-try-exception)
+- [組み込み例外 — Python 3.16.0a0 ドキュメント](https://docs.python.org/ja/dev/builtins/exceptions.html)
+- [Pythonリスト内包表記の使い方 \| note.nkmk.me](https://note.nkmk.me/python-list-comprehension/)
+- [Pythonで文字列を分割（区切り文字、改行、正規表現、文字数） \| note.nkmk.me](https://note.nkmk.me/python-split-rsplit-splitlines-re/)
+- [Pydantic model\_validator について](https://blog.foresta.me/posts/pydantic-model-validator/)
+- [uv エコシステムの勘所](https://zenn.dev/7shi/articles/20260302-uv-ecosystem)
+- [Pythonの\_\_init\_\_.py、\_\_all\_\_とはなんなのか #Python - Qiita](https://qiita.com/okmokm422/items/3f9c5ab05f96c2795c40)
+- [BFS (幅優先探索) 超入門！ 〜 キューを鮮やかに使いこなす 〜 #AtCoder - Qiita](https://qiita.com/drken/items/996d80bcae64649a6580)
+- [Pythonのdequeでキュー、スタック、デック（両端キュー）を扱う \| note.nkmk.me](https://note.nkmk.me/python-collections-deque/)
 ### AIの利用
 #### shshimiz
 docstringの作成、READMEの作成補助、迷路生成コードのエラー解決、42パターンを迷路に埋め込む処理の検討

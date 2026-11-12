@@ -2,5 +2,6 @@
 docs/
 .mypy_cache
 CLAUDE.md
-**/__pycache__/**
+__pycache__
 src/*.txt
+**/.DS_Store
