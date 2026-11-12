@@ -95,10 +95,17 @@ def test_same_seed_same_maze(*, is_perfect: bool) -> None:
     assert a == b
 
 
-def test_regenerate_with_seed_is_stable() -> None:
-    """Calling generate() twice on one seeded generator gives the same maze."""
+def test_regenerate_with_seed_differs() -> None:
+    """Calling generate() twice on one seeded generator gives new mazes."""
     gen = build(seed=7)
-    assert gen.generate() == gen.generate()
+    assert gen.generate() != gen.generate()
+
+
+def test_regenerate_sequence_is_reproducible() -> None:
+    """Two generators with the same seed give the same sequence of mazes."""
+    a = build(seed=7)
+    b = build(seed=7)
+    assert [a.generate() for _ in range(3)] == [b.generate() for _ in range(3)]
 
 
 def test_different_seeds_differ() -> None:
