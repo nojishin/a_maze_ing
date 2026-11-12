@@ -15,7 +15,8 @@ class InvalidArgumentsCountError(MazeError):
         """Build the usage message.
 
         Args:
-            count: Number of items in ``sys.argv``.
+            count: Number of arguments given, not counting the program
+                name.
 
         """
         super().__init__(
@@ -95,7 +96,6 @@ class ConfigDuplicateKeyError(MazeError):
 
 
 def _format_error(error: ErrorDetails) -> str:
-
     message = ""
     key = error["loc"]
     reason = error["msg"]
@@ -139,3 +139,17 @@ class OutputFileConflictError(MazeError):
         super().__init__(
             f"OUTPUT_FILE must not be the config file itself: '{path}'",
         )
+
+
+class PathResolveError(MazeError):
+    """Raised when a file path cannot be resolved."""
+
+    def __init__(self, file_path: Path, reason: str) -> None:
+        """Build the error message.
+
+        Args:
+            file_path: The path that could not be resolved.
+            reason: Why resolving failed.
+
+        """
+        super().__init__(f"Failed to resolve path {file_path!r}: {reason}")

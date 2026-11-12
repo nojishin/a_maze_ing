@@ -34,7 +34,7 @@ def choose_orientation(width: int, height: int, rnd: random.Random) -> bool:
     return rnd.choice([True, False])
 
 
-def parse_grid(width: int, height: int) -> list[list[int]]:
+def init_grid(width: int, height: int) -> list[list[int]]:
     """Create a grid whose only walls are the outer border.
 
     Args:
@@ -142,7 +142,7 @@ def repair(
         flood(grid, (x + dx, y + dy), visited)
 
 
-def divide_horizontal(  # noqa: PLR0913, PLR0917
+def divide_horizontal(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
@@ -173,7 +173,7 @@ def divide_horizontal(  # noqa: PLR0913, PLR0917
     divide(grid, x, wall_y + 1, width, y + height - wall_y - 1, rnd)
 
 
-def divide_vertical(  # noqa: PLR0913, PLR0917
+def divide_vertical(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
@@ -204,7 +204,7 @@ def divide_vertical(  # noqa: PLR0913, PLR0917
     divide(grid, wall_x + 1, y, x + width - wall_x - 1, height, rnd)
 
 
-def divide(  # noqa: PLR0913, PLR0917
+def divide(  # noqa: PLR0913, PLR0917 - recursive area split
     grid: list[list[int]],
     x: int,
     y: int,
@@ -236,7 +236,7 @@ def divide(  # noqa: PLR0913, PLR0917
         debug_printer.show(grid, "divide_vertical")
 
 
-def generate(maze_params: MazeParams) -> list[list[int]]:
+def generate(maze_params: MazeParams, rnd: random.Random) -> list[list[int]]:
     """Generate a maze containing the 42 pattern.
 
     The maze is built by recursive division. The 42 pattern is then closed off
@@ -244,7 +244,9 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     perfect.
 
     Args:
-        maze_params: Size, seed and perfection settings of the maze.
+        maze_params: Size, entry, exit and perfection settings of the maze.
+        rnd: Random number generator for walls, passages and loops. Its
+            state advances, so reusing it gives a different maze each call.
 
     Returns:
         A grid of wall bitmasks, indexed as ``grid[y][x]``.
@@ -256,11 +258,10 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     """
     width = maze_params.width
     height = maze_params.height
-    grid = parse_grid(width, height)
+    grid = init_grid(width, height)
     blocked = make_blocked(width, height)
     if maze_params.entry in blocked or maze_params.exit in blocked:
         raise PatternOverlapError
-    rnd = random.Random(maze_params.seed)
     debug_printer.reset(maze_params.entry, maze_params.exit)
     debug_printer.show(grid, "init")
     divide(grid, 0, 0, width, height, rnd)

@@ -10,6 +10,10 @@
 
 ## Instructions
 
+### 必要な環境
+- [uv](https://docs.astral.sh/uv/)
+- Python 3.13
+
 ### makeコマンド
 ```sh
 make install
@@ -20,7 +24,7 @@ make install
 make run # uv run a_maze_ing.py config.txt
 make debug # uv run python -m pdb a_maze_ing.py config.txt
 ```
-`config.txt`を読み込み`a_maze_ingg.py`を実行する
+`config.txt`を読み込み`a_maze_ing.py`を実行する
 
 ```sh
 make lint
@@ -32,12 +36,35 @@ make clean
 ```
 `__pycache__` やキャッシュを削除する
 
+### パッケージ（mazegen）のビルドとインストール
+`pyproject.toml` があるディレクトリで実行する。
+
+```sh
+uv build
+```
+`dist/` に `mazegen-1.0.0.tar.gz` と `mazegen-1.0.0-py3-none-any.whl` が作られる。
+リポジトリ直下にある2つのファイルも、この手順で作ったもの。
+
+作ったパッケージを別の仮想環境にインストールして、`a_maze_ing.py` を動かす。
+
+```sh
+uv venv ../mazegen-venv --python 3.13
+source ../mazegen-venv/bin/activate
+uv pip install dist/mazegen-1.0.0-py3-none-any.whl
+python a_maze_ing.py config.txt
+deactivate
+```
+`mazegen` が使う `pydantic` も一緒にインストールされる。
+`a_maze_ing.py` と同じディレクトリでは手元の `mazegen/` が先に読み込まれるので、インストールしたパッケージだけで動くか確かめるときは、別のディレクトリで[使い方の例](#使い方の例)を実行する。
+
 ### 操作コマンド
 
 | コマンド | 内容 |
 |---|---|
 | `generate` (`g`) | 新しい迷路を生成する |
 | `path` (`p`) | 解の経路を表示 / 非表示にする |
+| `color`(`c`) | 壁の色を変える |
+| `help`(`h`)  | 操作コマンドを表示する|
 | `exit` (`q`) | 終了する |
 
 ## Architecture
@@ -59,6 +86,7 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 ```
 .
 ├── a_maze_ing.py
+├── config.txt
 ├── errors
 │   ├── __init__.py
 │   ├── exceptions.py
@@ -67,9 +95,8 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 │   ├── __init__.py
 │   ├── cli.py
 │   └── maze_config.py
-├── LICENCE.md
+├── LICENSE.md
 ├── Makefile
-├── maze_analyzer.py
 ├── mazegen
 │   ├── __init__.py
 │   ├── errors.py
@@ -81,9 +108,12 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 │   │   └── pattern42.py
 │   ├── generator.py
 │   ├── models.py
+│   ├── py.typed
 │   └── solve
 │       ├── __init__.py
 │       └── solver.py
+├── mazegen-1.0.0-py3-none-any.whl
+├── mazegen-1.0.0.tar.gz
 ├── models
 │   ├── __init__.py
 │   └── config.py
@@ -134,7 +164,7 @@ PERFECT=False のときだけループを追加する
 ```
 #### 1. 外周の壁だけを作る
 ```py
-def parse_grid(width: int, height: int) -> list[list[int]]:
+def init_grid(width: int, height: int) -> list[list[int]]:
 ```
 迷路全体を、外周にだけ壁がある1つの広い部屋とする。
 
@@ -144,8 +174,8 @@ def make_blocked(width: int, height: int) -> set[tuple[int, int]]:
 ```
 
 7×5マスの42パターンを、迷路の中央に置くセルを求める。
-幅が9未満、または高さが7未満の迷路には置けないため、エラーにする。
-このあと `SEED` で乱数を初期化する。
+幅が9未満、または高さが7未満の迷路には置けないため、42パターンなしで迷路を作る。このとき `a_maze_ing.py` は警告を表示する
+乱数は `MazeGenerator` の生成時に `SEED` で1回だけ初期化したものを使い回す。
 
 #### 3. Recursive Divisionで壁を作る
 ```py
@@ -155,6 +185,7 @@ def divide(
     y: int,
     width: int,
     height: int,
+    rnd: random.Random,
 ) -> None:
 ```
 
@@ -176,7 +207,11 @@ def close_blocked(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 
 #### 5. 分断された領域をつなぎ直す
 ```py
-def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+def repair(
+    grid: list[list[int]],
+    blocked: set[tuple[int, int]],
+    rnd: random.Random,
+) -> None:
 ```
 
 1. `(0, 0)` から到達できるセルをBFSで調べる。
@@ -187,12 +222,48 @@ def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 ### nonperfect迷路
 `PERFECT=False` のときだけ実行する。
 ```py
-def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+def add_loops(
+    grid: list[list[int]],
+    blocked: set[tuple[int, int]],
+    rnd: random.Random,
+) -> None:
 ```
 行き止まりのセルをランダムな順に調べ、壁を1枚壊してループを作る。
 隣も行き止まりになる壁を優先して壊し、3×3の空間ができる壁と42パターンのセルに接する壁は壊さない。
 
 ## Reusable code
+迷路を生成して解く処理は `mazegen` パッケージにまとめてあり、別のプロジェクトからも使える。
+
+### インストール
+```sh
+pip install mazegen-1.0.0-py3-none-any.whl
+```
+Python 3.13 以上が必要。依存している `pydantic` も一緒にインストールされる。
+uv を使う場合は `uv pip install mazegen-1.0.0-py3-none-any.whl` でインストールする。
+
+### 使い方の例
+```py
+from mazegen import MazeGenerator
+
+generator = MazeGenerator(
+    width=20,         # 幅（セル数）
+    height=15,        # 高さ（セル数）
+    entry=(0, 0),     # 入口 (x, y)
+    exit=(19, 14),    # 出口 (x, y)
+    is_perfect=True,  # 入口から出口までの経路を1本だけにする
+    seed=42,          # 同じ seed なら同じ迷路になる
+)
+grid = generator.generate()  # 迷路を生成する
+path = generator.solve()     # 入口から出口までの最短経路を求める
+
+print(grid[0][0])       # 9 : セル (0, 0) の壁のビット（北と西が壁）
+print(path.coord[:3])   # [(0, 0), (0, 1), (0, 2)] : 経路が通るセルの座標
+print(path.directions)  # SSEEENNESS... : 経路の移動を N / E / S / W で表した文字列
+```
+- `seed` を省略すると、毎回違う迷路になる。
+- `is_perfect=False` にすると、ループがあり行き止まりの少ない迷路になる。
+- `grid` の形式は [迷路のデータ形式](#迷路のデータ形式) を参照。
+
 ### クラス
 ```py
 class MazeGenerator:
@@ -216,7 +287,8 @@ class MazeGenerator:
             entry: The ``(x, y)`` entry cell.
             exit: The ``(x, y)`` exit cell.
             is_perfect: Whether exactly one path joins any two cells.
-            seed: Random seed. ``None`` gives a different maze each time.
+            seed: Random seed. The same seed gives the same sequence of
+                mazes. ``None`` gives a different sequence each time.
 
         Raises:
             ParamsValidationError: If a parameter is invalid.
@@ -231,6 +303,7 @@ class MazeGenerator:
                 is_perfect=is_perfect,
                 seed=seed,
             )
+            self._rnd = random.Random(self._params.seed)
         except ValidationError as e:
             raise ParamsValidationError(e) from e
         self._grid: list[list[int]] | None = None
@@ -238,11 +311,14 @@ class MazeGenerator:
     def generate(self) -> list[list[int]]:
         """Generate a new maze.
 
+        Each call continues the generator's random sequence, so calling it
+        again gives a different maze, even with a seed.
+
         Returns:
             A grid of wall bitmasks, indexed as ``grid[y][x]``.
 
         """
-        self._grid = generate(self._params)
+        self._grid = generate(self._params, self._rnd)
         return self._grid
 
     def solve(self) -> PathResult:
@@ -284,14 +360,14 @@ class MazeGenerator:
 | `entry` | `tuple[int, int]` | 入口のセル `(x, y)` |
 | `exit` | `tuple[int, int]` | 出口のセル `(x, y)` |
 | `is_perfect` | `bool` | `True` なら任意の2セル間の経路が1本だけの完全迷路にする |
-| `seed` | `int \| None` | 乱数のシード。同じ値なら同じ迷路になる |
+| `seed` | `int \| None` | 乱数のシード。同じ値なら `generate()` で生成される迷路の順番が同じになる |
 
 不正な値を渡すと `ParamsValidationError`が送られる
 
 ### メソッド
 | メソッド | 戻り値 | 内容 |
 |---|---|---|
-| `generate()` | `list[list[int]]` | 新しい迷路を生成して返す。形式は [迷路のデータ形式](#迷路のデータ形式) を参照 |
+| `generate()` | `list[list[int]]` | 新しい迷路を生成して返す。呼ぶたびに別の迷路になる。形式は [迷路のデータ形式](#迷路のデータ形式) を参照 |
 | `solve()` | `PathResult` | 入口から出口までの最短経路を返す。`coord` は通るセルの座標のリスト、`directions` は `N` `E` `S` `W` で表した移動の文字列 |
 | `has_42pattern()` | `bool` | 迷路が42パターンを埋め込める大きさかどうかを返す |
 
@@ -330,12 +406,29 @@ Support multiple maze generation algorithms.
 改善できる点
 毎回、到達済みのセルすべてから候補を探し直しているので大きすぎる迷路を生成する場合に遅くなってしまう。
 ### 使用したツール
-claude ai、uv、mypy、flake8
+claude ai、uv(仮想環境)、mypy(型ヒントのチェック)、flake8(フォーマッター)、ruff(開発用フォーマッター)
 ## Resources
 ### 参考資料
-- [Maze algorithms](https://www.jamisbuck.org/mazes/)
-- [ビット演算](https://qiita.com/7shi/items/41d262ca11ea16d85abc)
-- [ビット演算子](https://note.nkmk.me/python-bit-operation/)
+- [Maze Algorithms](https://www.jamisbuck.org/mazes/)
+- [Python ビット演算 超入門 #Python - Qiita](https://qiita.com/7shi/items/41d262ca11ea16d85abc)
+- [Pythonのビット演算子（論理積、論理和、排他的論理和、反転、シフト） \| note.nkmk.me](https://note.nkmk.me/python-bit-operation/)
+- [\[Python\]コマンドライン引数を受け取る方法 #argparse - Qiita](https://qiita.com/to-fmak/items/4b136479099826959ea6)
+- [【ざっくりと解説】Pythonのsysモジュールの使い方（メモ） #Python3 - Qiita](https://qiita.com/sue-hc/items/2d93496af4b3857e80ab)
+- [Python, pathlibの使い方（パスをオブジェクトとして操作・処理） \| note.nkmk.me](https://note.nkmk.me/python-pathlib-usage/)
+- [Pythonの基本的なエラー一覧とその原因の確認方法 \| note.nkmk.me](https://note.nkmk.me/python-error-message/)
+- [例外となかよく #Python - Qiita](https://qiita.com/yulily/items/0844e1a928a95df32a26)
+- [【Python入門】Pythonにおけるclassの使い方とは? #Python3 - Qiita](https://qiita.com/Morio/items/0fe3abb58fcaff229f3d)
+- [pythonで継承とsuper()を使って派生クラスをinitしてみよう #Python - Qiita](https://qiita.com/Anaakikutsushit/items/c67d4edb0c01a97f3130)
+- [組み込み関数 — Python 3.14.7 ドキュメント](https://docs.python.org/ja/3/builtins/functions.html#super)
+- [【完全解説！】Pythonの例外処理を基礎から実務レベルまで完全にマスターする](https://zenn.dev/tigrebiz/articles/python-try-exception)
+- [組み込み例外 — Python 3.16.0a0 ドキュメント](https://docs.python.org/ja/dev/builtins/exceptions.html)
+- [Pythonリスト内包表記の使い方 \| note.nkmk.me](https://note.nkmk.me/python-list-comprehension/)
+- [Pythonで文字列を分割（区切り文字、改行、正規表現、文字数） \| note.nkmk.me](https://note.nkmk.me/python-split-rsplit-splitlines-re/)
+- [Pydantic model\_validator について](https://blog.foresta.me/posts/pydantic-model-validator/)
+- [uv エコシステムの勘所](https://zenn.dev/7shi/articles/20260302-uv-ecosystem)
+- [Pythonの\_\_init\_\_.py、\_\_all\_\_とはなんなのか #Python - Qiita](https://qiita.com/okmokm422/items/3f9c5ab05f96c2795c40)
+- [BFS (幅優先探索) 超入門！ 〜 キューを鮮やかに使いこなす 〜 #AtCoder - Qiita](https://qiita.com/drken/items/996d80bcae64649a6580)
+- [Pythonのdequeでキュー、スタック、デック（両端キュー）を扱う \| note.nkmk.me](https://note.nkmk.me/python-collections-deque/)
 ### AIの利用
 #### shshimiz
 docstringの作成、READMEの作成補助、迷路生成コードのエラー解決、42パターンを迷路に埋め込む処理の検討
