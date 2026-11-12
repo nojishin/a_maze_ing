@@ -108,6 +108,7 @@ Recursive Divisionで迷路を生成する（mazegen/generate/）
 │   │   └── pattern42.py
 │   ├── generator.py
 │   ├── models.py
+│   ├── py.typed
 │   └── solve
 │       ├── __init__.py
 │       └── solver.py
