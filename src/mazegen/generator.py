@@ -1,3 +1,5 @@
+import random
+
 from pydantic import ValidationError
 
 from .errors import MazeNotGeneratedError, ParamsValidationError
@@ -5,7 +7,7 @@ from .generate.gen_maze import generate
 from .generate.pattern42 import MIN_HEIGHT, MIN_WIDTH
 from .models import MazeParams, PathResult
 from .solve.solver import solve
-import random
+
 
 class MazeGenerator:
     """Generate a maze and find its solution path."""
@@ -59,7 +61,7 @@ class MazeGenerator:
             A grid of wall bitmasks, indexed as ``grid[y][x]``.
 
         """
-        self._grid = generate(self._params,self._rnd)
+        self._grid = generate(self._params, self._rnd)
         return self._grid
 
     def solve(self) -> PathResult:
