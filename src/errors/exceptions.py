@@ -15,7 +15,8 @@ class InvalidArgumentsCountError(MazeError):
         """Build the usage message.
 
         Args:
-            count: Number of items in ``sys.argv``.
+            count: Number of arguments given, not counting the program
+                name.
 
         """
         super().__init__(
