@@ -80,8 +80,8 @@ def write_file(
     texts: list[str] = [
         *("".join(f"{v:x}" for v in row) for row in grid),
         "",
-        ", ".join(map(str, entry)),
-        ", ".join(map(str, exit)),
+        ",".join(map(str, entry)),
+        ",".join(map(str, exit)),
         directions,
         "",
     ]
