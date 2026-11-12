@@ -5,7 +5,7 @@ from .generate.gen_maze import generate
 from .generate.pattern42 import MIN_HEIGHT, MIN_WIDTH
 from .models import MazeParams, PathResult
 from .solve.solver import solve
-
+import random
 
 class MazeGenerator:
     """Generate a maze and find its solution path."""
@@ -28,7 +28,8 @@ class MazeGenerator:
             entry: The ``(x, y)`` entry cell.
             exit: The ``(x, y)`` exit cell.
             is_perfect: Whether exactly one path joins any two cells.
-            seed: Random seed. ``None`` gives a different maze each time.
+            seed: Random seed. The same seed gives the same sequence of
+                mazes. ``None`` gives a different sequence each time.
 
         Raises:
             ParamsValidationError: If a parameter is invalid.
@@ -43,6 +44,7 @@ class MazeGenerator:
                 is_perfect=is_perfect,
                 seed=seed,
             )
+            self._rnd = random.Random(self._params.seed)
         except ValidationError as e:
             raise ParamsValidationError(e) from e
         self._grid: list[list[int]] | None = None
@@ -50,11 +52,14 @@ class MazeGenerator:
     def generate(self) -> list[list[int]]:
         """Generate a new maze.
 
+        Each call continues the generator's random sequence, so calling it
+        again gives a different maze, even with a seed.
+
         Returns:
             A grid of wall bitmasks, indexed as ``grid[y][x]``.
 
         """
-        self._grid = generate(self._params)
+        self._grid = generate(self._params,self._rnd)
         return self._grid
 
     def solve(self) -> PathResult:
