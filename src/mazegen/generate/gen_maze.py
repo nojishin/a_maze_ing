@@ -233,7 +233,7 @@ def divide(  # noqa: PLR0913, PLR0917 - recursive area split
         divide_vertical(grid, x, y, width, height, rnd)
 
 
-def generate(maze_params: MazeParams) -> list[list[int]]:
+def generate(maze_params: MazeParams, rnd: random.Random) -> list[list[int]]:
     """Generate a maze containing the 42 pattern.
 
     The maze is built by recursive division. The 42 pattern is then closed off
@@ -241,7 +241,9 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     perfect.
 
     Args:
-        maze_params: Size, seed and perfection settings of the maze.
+        maze_params: Size, entry, exit and perfection settings of the maze.
+        rnd: Random number generator for walls, passages and loops. Its
+            state advances, so reusing it gives a different maze each call.
 
     Returns:
         A grid of wall bitmasks, indexed as ``grid[y][x]``.
@@ -257,7 +259,6 @@ def generate(maze_params: MazeParams) -> list[list[int]]:
     blocked = make_blocked(width, height)
     if maze_params.entry in blocked or maze_params.exit in blocked:
         raise PatternOverlapError
-    rnd = random.Random(maze_params.seed)
     divide(grid, 0, 0, width, height, rnd)
     close_blocked(grid, blocked)
     repair(grid, blocked, rnd)

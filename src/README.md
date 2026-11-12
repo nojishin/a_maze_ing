@@ -173,8 +173,8 @@ def make_blocked(width: int, height: int) -> set[tuple[int, int]]:
 ```
 
 7×5マスの42パターンを、迷路の中央に置くセルを求める。
-幅が9未満、または高さが7未満の迷路には置けないため、42パターンなしで迷路を作る。このとき `a_maze_ing.py` は警告を表示する。
-このあと `SEED` で乱数を初期化する。
+幅が9未満、または高さが7未満の迷路には置けないため、42パターンなしで迷路を作る。このとき `a_maze_ing.py` は警告を表示する
+乱数は `MazeGenerator` の生成時に `SEED` で1回だけ初期化したものを使い回す。
 
 #### 3. Recursive Divisionで壁を作る
 ```py
@@ -286,7 +286,8 @@ class MazeGenerator:
             entry: The ``(x, y)`` entry cell.
             exit: The ``(x, y)`` exit cell.
             is_perfect: Whether exactly one path joins any two cells.
-            seed: Random seed. ``None`` gives a different maze each time.
+            seed: Random seed. The same seed gives the same sequence of
+                mazes. ``None`` gives a different sequence each time.
 
         Raises:
             ParamsValidationError: If a parameter is invalid.
@@ -301,6 +302,7 @@ class MazeGenerator:
                 is_perfect=is_perfect,
                 seed=seed,
             )
+            self._rnd = random.Random(self._params.seed)
         except ValidationError as e:
             raise ParamsValidationError(e) from e
         self._grid: list[list[int]] | None = None
@@ -308,11 +310,14 @@ class MazeGenerator:
     def generate(self) -> list[list[int]]:
         """Generate a new maze.
 
+        Each call continues the generator's random sequence, so calling it
+        again gives a different maze, even with a seed.
+
         Returns:
             A grid of wall bitmasks, indexed as ``grid[y][x]``.
 
         """
-        self._grid = generate(self._params)
+        self._grid = generate(self._params, self._rnd)
         return self._grid
 
     def solve(self) -> PathResult:
@@ -354,14 +359,14 @@ class MazeGenerator:
 | `entry` | `tuple[int, int]` | 入口のセル `(x, y)` |
 | `exit` | `tuple[int, int]` | 出口のセル `(x, y)` |
 | `is_perfect` | `bool` | `True` なら任意の2セル間の経路が1本だけの完全迷路にする |
-| `seed` | `int \| None` | 乱数のシード。同じ値なら同じ迷路になる |
+| `seed` | `int \| None` | 乱数のシード。同じ値なら `generate()` で生成される迷路の順番が同じになる |
 
 不正な値を渡すと `ParamsValidationError`が送られる
 
 ### メソッド
 | メソッド | 戻り値 | 内容 |
 |---|---|---|
-| `generate()` | `list[list[int]]` | 新しい迷路を生成して返す。形式は [迷路のデータ形式](#迷路のデータ形式) を参照 |
+| `generate()` | `list[list[int]]` | 新しい迷路を生成して返す。呼ぶたびに別の迷路になる。形式は [迷路のデータ形式](#迷路のデータ形式) を参照 |
 | `solve()` | `PathResult` | 入口から出口までの最短経路を返す。`coord` は通るセルの座標のリスト、`directions` は `N` `E` `S` `W` で表した移動の文字列 |
 | `has_42pattern()` | `bool` | 迷路が42パターンを埋め込める大きさかどうかを返す |
 
