@@ -9,6 +9,7 @@ from errors.exceptions import (
     ConfigFileReadError,
     ConfigValidationError,
     OutputFileConflictError,
+    PathResolveError,
 )
 from models.config import Config
 
@@ -54,7 +55,13 @@ def _ensure_output_differs_from_config(
     config_path: Path,
     output_path: Path,
 ) -> None:
-    if config_path.resolve() == output_path.resolve():
+    try:
+        is_same = config_path.samefile(output_path)
+    except FileNotFoundError:
+        return
+    except (OSError, ValueError) as e:
+        raise PathResolveError(output_path, str(e)) from e
+    if is_same:
         raise OutputFileConflictError(output_path)
 
 
