@@ -4,7 +4,8 @@ from pathlib import Path
 from errors.exceptions import MazeError, OutputFileWriteError
 from errors.handler import error_handler
 from input.maze_config import parse_config
-from mazegen import MazeGenerator, MazeGenError
+from mazegen import MazeGenerator, MazeGenError, PathResult
+from models.config import Config
 from visualizer.renderder import render_maze
 
 WALL_COLORS = [
@@ -79,8 +80,8 @@ def write_file(
     texts: list[str] = [
         *("".join(f"{v:x}" for v in row) for row in grid),
         "",
-        ", ".join(map(str, entry)),
-        ", ".join(map(str, exit)),
+        ",".join(map(str, entry)),
+        ",".join(map(str, exit)),
         directions,
         "",
     ]
@@ -92,10 +93,52 @@ def write_file(
         raise OutputFileWriteError(output_file, str(e)) from e
 
 
-def main() -> None:  # noqa: C901, PLR0912, PLR0915 - command dispatch
-    """Read the config, then run the interactive command loop.
+def generate_maze(
+    maze_generator: MazeGenerator,
+    config: Config,
+) -> tuple[list[list[int]], PathResult]:
+    """Generate and solve a new maze, then write it to the output file.
 
-    Errors are printed and the program exits with status 1.
+    A warning is printed if the maze is too small for the 42 pattern.
+
+    Args:
+        maze_generator: The generator built from the config.
+        config: The validated config, giving the entry, the exit and the
+            output file.
+
+    Returns:
+        The maze grid of wall bitmasks, indexed as ``grid[y][x]``, and its
+        solution path.
+
+    Raises:
+        MazeGenError: If the maze cannot be generated or solved.
+        OutputFileWriteError: If the output file cannot be written.
+
+    """
+    grid = maze_generator.generate()
+    path = maze_generator.solve()
+    if not maze_generator.has_42pattern():
+        print(
+            "Warning: the 42 pattern could not be embedded "
+            "(maze too small).",
+            file=sys.stderr,
+        )
+    write_file(
+        output_file=config.output_file,
+        grid=grid,
+        entry=config.entry,
+        exit=config.exit,
+        directions=path.directions,
+    )
+    return grid, path
+
+
+def main() -> None:  # noqa: C901, PLR0912 - command dispatch
+    """Read the config, show a first maze, then run the command loop.
+
+    The first maze is generated, written to the output file and displayed
+    before any command is read. Errors are printed and the program exits
+    with status 1.
 
     """
     try:
@@ -115,11 +158,19 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915 - command dispatch
     except MazeGenError as e:
         error_handler(e)
 
-    print(HELP_MSG)
     show_path = True
     color_idx = 0
-    grid: list[list[int]] | None = None
     try:
+        grid, path = generate_maze(maze_generator, config)
+        print_maze(
+            grid=grid,
+            entry=config.entry,
+            exit=config.exit,
+            path=path.coord,
+            wall=WALL_COLORS[color_idx],
+            show_path=show_path,
+        )
+        print(HELP_MSG)
         while True:
             try:
                 cmd = input("> ").strip().lower()
@@ -128,14 +179,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915 - command dispatch
                 sys.exit(0)
             match cmd:
                 case "generate" | "g":
-                    grid = maze_generator.generate()
-                    path = maze_generator.solve()
-                    if not maze_generator.has_42pattern():
-                        print(
-                            "Warning: the 42 pattern could not be embedded "
-                            "(maze too small).",
-                            file=sys.stderr,
-                        )
+                    grid, path = generate_maze(maze_generator, config)
                     print_maze(
                         grid=grid,
                         entry=config.entry,
@@ -144,20 +188,7 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915 - command dispatch
                         wall=WALL_COLORS[color_idx],
                         show_path=show_path,
                     )
-                    write_file(
-                        output_file=config.output_file,
-                        grid=grid,
-                        entry=config.entry,
-                        exit=config.exit,
-                        directions=path.directions,
-                    )
                 case "path" | "p":
-                    if grid is None:
-                        print(
-                            "No maze yet. Run 'generate' first.",
-                            file=sys.stderr,
-                        )
-                        continue
                     if show_path:
                         show_path = False
                         print("Solution path: hidden")
@@ -173,12 +204,6 @@ def main() -> None:  # noqa: C901, PLR0912, PLR0915 - command dispatch
                         show_path=show_path,
                     )
                 case "color" | "c":
-                    if grid is None:
-                        print(
-                            "No maze yet. Run 'generate' first.",
-                            file=sys.stderr,
-                        )
-                        continue
                     color_idx = (color_idx + 1) % len(WALL_COLORS)
                     print("Wall color changed")
                     print_maze(

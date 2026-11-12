@@ -32,7 +32,7 @@ def _extract_dict(text: str) -> dict[str, str]:
     text_splitlines = text.splitlines()
     result: dict[str, str] = {}
     for i, line in enumerate(text_splitlines):
-        if line.startswith("#"):
+        if not line.strip() or line.startswith("#"):
             continue
         key, sep, value = line.partition("=")
         if not sep:

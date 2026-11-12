@@ -10,6 +10,10 @@
 
 ## Instructions
 
+### 必要な環境
+- [uv](https://docs.astral.sh/uv/)
+- Python 3.13
+
 ### makeコマンド
 ```sh
 make install
@@ -20,7 +24,7 @@ make install
 make run # uv run a_maze_ing.py config.txt
 make debug # uv run python -m pdb a_maze_ing.py config.txt
 ```
-`config.txt`を読み込み`a_maze_ingg.py`を実行する
+`config.txt`を読み込み`a_maze_ing.py`を実行する
 
 ```sh
 make lint
@@ -31,6 +35,27 @@ make lint
 make clean
 ```
 `__pycache__` やキャッシュを削除する
+
+### パッケージ（mazegen）のビルドとインストール
+`pyproject.toml` があるディレクトリで実行する。
+
+```sh
+uv build
+```
+`dist/` に `mazegen-1.0.0.tar.gz` と `mazegen-1.0.0-py3-none-any.whl` が作られる。
+リポジトリ直下にある2つのファイルも、この手順で作ったもの。
+
+作ったパッケージを別の仮想環境にインストールして、`a_maze_ing.py` を動かす。
+
+```sh
+uv venv ../mazegen-venv --python 3.13
+source ../mazegen-venv/bin/activate
+uv pip install dist/mazegen-1.0.0-py3-none-any.whl
+python a_maze_ing.py config.txt
+deactivate
+```
+`mazegen` が使う `pydantic` も一緒にインストールされる。
+`a_maze_ing.py` と同じディレクトリでは手元の `mazegen/` が先に読み込まれるので、インストールしたパッケージだけで動くか確かめるときは、別のディレクトリで[使い方の例](#使い方の例)を実行する。
 
 ### 操作コマンド
 
@@ -148,7 +173,7 @@ def make_blocked(width: int, height: int) -> set[tuple[int, int]]:
 ```
 
 7×5マスの42パターンを、迷路の中央に置くセルを求める。
-幅が9未満、または高さが7未満の迷路には置けないため、エラーにする。
+幅が9未満、または高さが7未満の迷路には置けないため、42パターンなしで迷路を作る。このとき `a_maze_ing.py` は警告を表示する
 乱数は `MazeGenerator` の生成時に `SEED` で1回だけ初期化したものを使い回す。
 
 #### 3. Recursive Divisionで壁を作る
@@ -159,6 +184,7 @@ def divide(
     y: int,
     width: int,
     height: int,
+    rnd: random.Random,
 ) -> None:
 ```
 
@@ -180,7 +206,11 @@ def close_blocked(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 
 #### 5. 分断された領域をつなぎ直す
 ```py
-def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+def repair(
+    grid: list[list[int]],
+    blocked: set[tuple[int, int]],
+    rnd: random.Random,
+) -> None:
 ```
 
 1. `(0, 0)` から到達できるセルをBFSで調べる。
@@ -191,12 +221,48 @@ def repair(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
 ### nonperfect迷路
 `PERFECT=False` のときだけ実行する。
 ```py
-def add_loops(grid: list[list[int]], blocked: set[tuple[int, int]]) -> None:
+def add_loops(
+    grid: list[list[int]],
+    blocked: set[tuple[int, int]],
+    rnd: random.Random,
+) -> None:
 ```
 行き止まりのセルをランダムな順に調べ、壁を1枚壊してループを作る。
 隣も行き止まりになる壁を優先して壊し、3×3の空間ができる壁と42パターンのセルに接する壁は壊さない。
 
 ## Reusable code
+迷路を生成して解く処理は `mazegen` パッケージにまとめてあり、別のプロジェクトからも使える。
+
+### インストール
+```sh
+pip install mazegen-1.0.0-py3-none-any.whl
+```
+Python 3.13 以上が必要。依存している `pydantic` も一緒にインストールされる。
+uv を使う場合は `uv pip install mazegen-1.0.0-py3-none-any.whl` でインストールする。
+
+### 使い方の例
+```py
+from mazegen import MazeGenerator
+
+generator = MazeGenerator(
+    width=20,         # 幅（セル数）
+    height=15,        # 高さ（セル数）
+    entry=(0, 0),     # 入口 (x, y)
+    exit=(19, 14),    # 出口 (x, y)
+    is_perfect=True,  # 入口から出口までの経路を1本だけにする
+    seed=42,          # 同じ seed なら同じ迷路になる
+)
+grid = generator.generate()  # 迷路を生成する
+path = generator.solve()     # 入口から出口までの最短経路を求める
+
+print(grid[0][0])       # 9 : セル (0, 0) の壁のビット（北と西が壁）
+print(path.coord[:3])   # [(0, 0), (0, 1), (0, 2)] : 経路が通るセルの座標
+print(path.directions)  # SSEEENNESS... : 経路の移動を N / E / S / W で表した文字列
+```
+- `seed` を省略すると、毎回違う迷路になる。
+- `is_perfect=False` にすると、ループがあり行き止まりの少ない迷路になる。
+- `grid` の形式は [迷路のデータ形式](#迷路のデータ形式) を参照。
+
 ### クラス
 ```py
 class MazeGenerator:

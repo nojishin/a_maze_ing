@@ -18,5 +18,5 @@ def get_config_path() -> Path:
     """
     argv_len = len(sys.argv)
     if argv_len != EXPECTED_ARGC:
-        raise InvalidArgumentsCountError(argv_len)
+        raise InvalidArgumentsCountError(argv_len - 1)
     return Path(sys.argv[1])
